@@ -7,9 +7,6 @@
 \description{Generates the inverse of the error (spatial or temporal) variance-covariance matrix R based on an autorregressive of order 1 homogeneous error structure (AR1) with or without nugget. Best guesses of variance component parameters (rhox, rhoy, VarE and nugget) need to be provided according to what is expected in the particular study.
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
-\code{Rmatrix}{Generates the inverse of the error (spatial or temporal) variance-covariance matrix R based on an autorregressive of order 1 homogeneous error structure (AR1) with or without nugget. Best guesses of variance component parameters (rhox, rhoy, VarE and nugget) need to be provided according to what is expected in the particular study.
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
-}
 \usage{
 Rmatrix(matdf, VarE=1, rhox=0, rhoy=0, nugget=0, regular=FALSE)
 }
@@ -56,7 +53,7 @@ Rmatrix(matdf, VarE=1, rhox=0, rhoy=0, nugget=0, regular=FALSE)
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{\code{\code{ \link{p_rep_design}}, \code{ \link{Gmatrix}}, \code{\link{SwapMethods}}
+\seealso{\code{\link{p_rep_design}}, \code{ \link{Gmatrix}}, \code{\link{SwapMethods}}
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
@@ -65,6 +62,7 @@ Rmatrix(matdf, VarE=1, rhox=0, rhoy=0, nugget=0, regular=FALSE)
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
+
 Rmatrix <- function(matdf, VarE=1, rhox=0, rhoy=0, nugget=0, regular=FALSE) {
 
   # Debugging message to show the input parameters

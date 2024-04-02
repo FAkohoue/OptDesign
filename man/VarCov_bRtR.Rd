@@ -7,9 +7,6 @@
 \description{generates the variance-covariance matrix (information matrix) of treatment effects and calculates traces and/or log(determinants) for a linear mixed model with both random block and treatment effects.
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
-\code{VarCov_bRtR}{generates the variance-covariance matrix (information matrix) of treatment effects and calculates traces and/or log(determinants) for a linear mixed model with both random block and treatment effects.
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
-}
 \usage{
 VarCov_bRtR <- function(matdf, criteria = "A", s2Bl = 0.1, Ginv = NULL, Rinv = NULL, K = NULL)
 }
@@ -56,7 +53,7 @@ VarCov_bRtR <- function(matdf, criteria = "A", s2Bl = 0.1, Ginv = NULL, Rinv = N
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{\code{\code{ \link{p_rep_design}}, \code{ \link{Gmatrix}}, \code{\link{Rmatrix}, \code{\link{SwapMethods}}
+\seealso{\code{\link{p_rep_design}}, \code{\link{Gmatrix}}, \code{\link{Rmatrix}}, \code{\link{SwapMethods}}
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
@@ -65,6 +62,7 @@ VarCov_bRtR <- function(matdf, criteria = "A", s2Bl = 0.1, Ginv = NULL, Rinv = N
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
+
 VarCov_bRtR <- function(matdf, criteria="A", s2Bl=0.1, Ginv=NULL, Rinv=NULL, K=NULL) {
   # Checking if Rinv and Ginv are not provided
   if(is.null(Rinv)){

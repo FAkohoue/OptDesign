@@ -1,6 +1,6 @@
 Package: OptDesign
 Type: Package
-Title: An R package to generate an optimize experimental designs to evaluate genetically correlated breeding lines.
+Title: An R package to generate and optimize experimental designs to evaluate genetically correlated breeding lines.
 Version: 0.1.0
 Author: Félicien Akohoue
 Maintainer: Félicien Akohoue <akohoue.f@gmail.com>

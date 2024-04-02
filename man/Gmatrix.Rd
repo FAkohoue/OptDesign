@@ -7,9 +7,6 @@
 \description{This function generates the inverse of the random factor variance-covariance matrix G by Cholesky decomposition.
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
-\code{Gmatrix}{This function generates the inverse of the random factor variance-covariance matrix G by Cholesky decomposition.
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
-}
 \usage{
 Gmatrix(ng = 0, VarG = 1, G = NULL)
 }
@@ -47,7 +44,7 @@ Gmatrix(ng = 0, VarG = 1, G = NULL)
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{\code{\code{ \link{p_rep_design}}, \code{\link{Rmatrix}, \code{\link{SwapMethods}}
+\seealso{\code{\link{p_rep_design}}, \code{\link{Rmatrix}}, \code{\link{SwapMethods}}
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{

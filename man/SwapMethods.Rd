@@ -7,9 +7,6 @@
 \description{Randomly selects a block and a single or several pairs of treatments, swaps them and creates a new experimental layout.
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
-\code{SwapMethods}{Randomly selects a block and a single or several pairs of treatments, swaps them and creates a new experimental layout.
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
-}
 \usage{
 SwapMethods(matdf, pairs = 1, swapmethod = "within")
 }
@@ -47,7 +44,7 @@ SwapMethods(matdf, pairs = 1, swapmethod = "within")
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{\code{\code{ \link{p_rep_design}}, \code{ \link{Gmatrix}}, \code{\link{Rmatrix}}
+\seealso{\code{\link{p_rep_design}}, \code{\link{Gmatrix}}, \code{\link{Rmatrix}}
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
@@ -56,6 +53,7 @@ SwapMethods(matdf, pairs = 1, swapmethod = "within")
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
+
 SwapMethods <- function(matdf, pairs=1, swapmethod="within") {
 
   trt <- max(matdf[,"Treatment"])
@@ -112,12 +110,11 @@ SwapMethods <- function(matdf, pairs=1, swapmethod="within") {
   }
 
   # Check if 'Row' and 'Col' columns exist before sorting
-  if ("Row" %in% names(mat) && "Col" %in% names(mat)) {
+  if
+  if ("Row" %in% names(mat) && "Col" %in% names(mat)){
     return(mat[order(mat[,"Row"], mat[,"Col"]), ])
   } else {
-    return(mat)
-  }
-}
+    return(mat)}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory (show via RShowDoc("KEYWORDS")):
