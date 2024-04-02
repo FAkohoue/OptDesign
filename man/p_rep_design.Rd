@@ -7,6 +7,9 @@
 \description{ Generates a p-rep row column design for plant breeding field trials. The function takes various parameters to create a matrix representing the layout of unreplicated treatments,checks, and replicated treatments across experimental blocks. The function randomizes treatment assignments, ensures proper distribution of treatments within blocks, and corrects for any over-representation of replicated treatments. Finally, it generates a field plan dataframe with information about block, row, column, plot number, treatment assignment, and trial identifier.
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
+\code{p_rep_design}{ Generates a p-rep row column design for plant breeding field trials. The function takes various parameters to create a matrix representing the layout of unreplicated treatments,checks, and replicated treatments across experimental blocks. The function randomizes treatment assignments, ensures proper distribution of treatments within blocks, and corrects for any over-representation of replicated treatments. Finally, it generates a field plan dataframe with information about block, row, column, plot number, treatment assignment, and trial identifier.
+%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+}
 \usage{
 p_rep_design <- function(trt_data = NULL,
                          rep_trt_data = NULL,
@@ -73,7 +76,7 @@ p_rep_design <- function(trt_data = NULL,
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{
+\seealso{\code{\code{\code{ \link{Gmatrix}}, \code{\link{Rmatrix}, \code{\link{SwapMethods}}
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{

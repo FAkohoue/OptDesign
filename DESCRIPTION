@@ -1,10 +1,10 @@
 Package: OptDesign
 Type: Package
-Title: An R package to generate an optimize a p-rep row column design to evaluate genetically correlated breeding lines.
+Title: An R package to generate an optimize experimental designs to evaluate genetically correlated breeding lines.
 Version: 0.1.0
 Author: Félicien Akohoue
 Maintainer: Félicien Akohoue <akohoue.f@gmail.com>
-Description: This package contains functions that generate and optimize a p-rep row column field design for plant breeding trials to effenciently evaluate genetically correlated breeding lines. The design is optimized based on spatial correlation and genetic relationship between the genotypes.
+Description: This package contains functions that generate and optimize field designs for plant breeding trials to effenciently evaluate genetically correlated breeding lines. The design is optimized based on spatial correlation and genetic relationship between the genotypes.
     The function randomizes treatment assignments, ensures proper distribution of treatments within blocks, and corrects for any over-representation of replicated treatments. Finally, it generates a field plan dataframe with information about block, row, column, plot number, treatment assignment, and trial identifier.
 Depends: dplyr, agridat, desplot
 License: GPL-2
