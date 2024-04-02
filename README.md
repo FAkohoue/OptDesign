@@ -1,5 +1,5 @@
 # OptDesign
-An R package to generate an optimize a p-rep row column design to evaluate genetically correlated breeding lines.
+An R package for generating improved experimental designs with spatially and genetically correlated observations using mixed models.
 
 # Installation in R
 # Install devtools
