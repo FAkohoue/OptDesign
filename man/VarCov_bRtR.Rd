@@ -34,7 +34,7 @@ VarCov_bRtR(matdf, criteria = "A", s2Bl = 0.1, Ginv = NULL, Rinv = NULL, K = NUL
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }
-\value{either a trace value or log of determinant of the variance-covariance matrix (information matrix) for treatments, together with the K matrix to use in future runs.
+\value{Either a trace value or log of determinant of the variance-covariance matrix (information matrix) for treatments, together with the K matrix to use in future runs.
 %%  ~Describe the value returned
 %%  If it is a LIST, use
 %%  \item{comp1 }{Description of 'comp1'}
