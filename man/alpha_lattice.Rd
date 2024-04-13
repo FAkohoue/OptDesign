@@ -135,7 +135,7 @@ alpha_lattice <- function(trt_names, nrep, nblock, ntrt, rb, cb, trial) {
 
   return(matdf)
 }
-
+}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory (show via RShowDoc("KEYWORDS")):
 % \keyword{ ~kwd1 }
