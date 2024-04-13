@@ -44,7 +44,7 @@ Gmatrix(ng = 0, VarG = 1, G = NULL)
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{\code{\link{p_rep_design}}, \code{\link{Rmatrix}}, \code{\link{SwapMethods}}
+\seealso{\code{\link{p_rep_design}}, \code{\link{Rmatrix}}, \code{\link{SwapMethods}}, \code{\link{alpha_lattice}}
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{

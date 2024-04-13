@@ -44,7 +44,7 @@ SwapMethods(matdf, pairs = 1, swapmethod = "within")
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{\code{\link{p_rep_design}}, \code{\link{Gmatrix}}, \code{\link{Rmatrix}}
+\seealso{\code{\link{p_rep_design}}, \code{\link{Gmatrix}}, \code{\link{Rmatrix}}, \code{\link{alpha_lattice}}
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
