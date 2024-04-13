@@ -79,12 +79,12 @@ alpha_lattice <- function(trt_names, nrep, nblock, ntrt, rb, cb, trial) {
 
   # Check if the total number of treatment allocations is equal to the total plots
   if (ntrt * nrep != total_plots) {
-    stop("The total number of treatment allocations must be equal to the total number of plots.")
+      stop("The total number of treatment allocations must be equal to the total number of plots.")
   }
 
   # Check if the number of treatments can be divided among the blocks within a replicate
-  if (ntrt %% nblock != 0) {
-    stop("The number of treatments must be divisible by the number of blocks.")
+  if (mod(ntrt, nblock) != 0) {
+      stop("The number of treatments must be divisible by the number of blocks.")
   }
 
   cat("Generating block, row, column, and plot numbers...\n")
