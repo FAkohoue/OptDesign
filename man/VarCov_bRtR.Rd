@@ -8,7 +8,7 @@
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-VarCov_bRtR <- function(matdf, criteria = "A", s2Bl = 0.1, Ginv = NULL, Rinv = NULL, K = NULL)
+VarCov_bRtR(matdf, criteria = "A", s2Bl = 0.1, Ginv = NULL, Rinv = NULL, K = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
