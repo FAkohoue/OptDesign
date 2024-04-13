@@ -8,7 +8,7 @@
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-design <- alpha_lattice(trt_names = NULL, nrep, nblock, ntrt, rb, cb, trial = NULL)
+alpha_lattice(trt_names = NULL, nrep, nblock, ntrt, rb, cb, trial = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -64,10 +64,8 @@ design <- alpha_lattice(trt_names = NULL, nrep, nblock, ntrt, rb, cb, trial = NU
 trt_names <- c('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
                'AB', 'BC', 'CD', 'DE', 'EF', 'FG', 'GH', 'HI', 'IJ', 'JK', 'KL', 'LM',
                'BA', 'CB', 'DC', 'ED', 'FE', 'GF', 'HG', 'IH', 'JI', 'KJ', 'LK', 'ML')
-design <- alpha_lattice(trt_names = trt_names, nreplicates = 3, nblock = 3, ntreatments = 36, rb = 4, cb = 3, trial = 'ZKP')
+alpha_lattice(trt_names = trt_names, nrep = 3, nblock = 3, ntrt = 36, rb = 4, cb = 3, trial = 'ZKP')
 
-# View the generated design
-print(design)
 ##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
