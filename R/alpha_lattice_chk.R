@@ -6,7 +6,7 @@
 #' @param ntrt: Number of treatments
 #' @param rb: Number of rows per block
 #' @param cb: Number of columns per block
-#' @param check Vector of unique check treatment names
+#' @param chk Vector of unique check treatment names
 #' @param trial: Trial identifier (optional, can be used to differentiate between multiple trials)
 #'
 #' @return A matrix of field plan generated successfully
@@ -26,18 +26,18 @@
 #' ntrt = 100,
 #' rb = 6,
 #' cb = 4,
-#' check = controls,
+#' chk = controls,
 #' trial = 'ZKP'
 #' )
 #'
 #'
-alpha_lattice_chk <- function(trt_names = NULL, nrep, nblock, ntrt, rb, cb, check, trial = NULL) {
+alpha_lattice_chk <- function(trt_names = NULL, nrep, nblock, ntrt, rb, cb, chk, trial = NULL) {
 
   # Ensure the controls are a character vector
-  controls <- as.character(check)
+  controls <- as.character(chk)
 
   # Number of controls
-  ncontrols <- length(check)
+  ncontrols <- length(chk)
 
   # Calculate the total number of plots
   plots_per_block <- rb * cb
@@ -100,7 +100,7 @@ alpha_lattice_chk <- function(trt_names = NULL, nrep, nblock, ntrt, rb, cb, chec
 
         # Assign control treatments to the block (exactly once in each block)
         control_indices <- sample(block_indices, ncontrols, replace = FALSE)
-        design$Treatment[control_indices] <- check
+        design$Treatment[control_indices] <- chk
       }
     }
   })
