@@ -1,5 +1,5 @@
-\name{alpha_lattice_chk}
-\alias{alpha_lattice_chk}
+\name{chk_alpha_lattice}
+\alias{chk_alpha_lattice}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Alpha lattice design with checks included in each block for agricultural experiments
 %%  ~~function to do ... ~~
@@ -8,7 +8,7 @@
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-alpha_lattice_chk(trt_names = NULL, nrep, nblock, ntrt, rb, cb, check, trial = NULL)
+chk_alpha_lattice(trt_names = NULL, nrep, nblock, ntrt, rb, cb, chk, trial = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -30,7 +30,7 @@ alpha_lattice_chk(trt_names = NULL, nrep, nblock, ntrt, rb, cb, check, trial = N
   \item{cb}{Number of columns per block
 %%     ~~Describe \code{x} here~~
 }
-  \item{check}{Vector of unique check treatment names
+  \item{chk}{Vector of unique check treatment names
 %%     ~~Describe \code{x} here~~
 }
   \item{trial}{Trial identifier (optional, can be used to differentiate between multiple trials)
@@ -69,14 +69,14 @@ controls <- c('Control1', 'Control2', 'Control3', 'Control4')
 # Call the function with control treatments
 trt_names <- as.character(1:100)
 
-alpha_lattice_chk(
+chk_alpha_lattice(
   trt_names = trt_names,
   nrep = 3,
   nblock = 5,
   ntrt = 100,
   rb = 6,
   cb = 4,
-  check = controls,
+  chk = controls,
   trial = 'ZKP'
 )
 ##---- Should be DIRECTLY executable !! ----
@@ -84,13 +84,13 @@ alpha_lattice_chk(
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-alpha_lattice_chk <- function(trt_names = NULL, nrep, nblock, ntrt, rb, cb, check, trial = NULL) {
+chk_alpha_lattice <- function(trt_names = NULL, nrep, nblock, ntrt, rb, cb, chk, trial = NULL) {
 
   # Ensure the controls are a character vector
-  controls <- as.character(check)
+  controls <- as.character(chk)
 
   # Number of controls
-  ncontrols <- length(check)
+  ncontrols <- length(chk)
 
   # Calculate the total number of plots
   plots_per_block <- rb * cb
@@ -153,7 +153,7 @@ alpha_lattice_chk <- function(trt_names = NULL, nrep, nblock, ntrt, rb, cb, chec
 
         # Assign control treatments to the block (exactly once in each block)
         control_indices <- sample(block_indices, ncontrols, replace = FALSE)
-        design$Treatment[control_indices] <- check
+        design$Treatment[control_indices] <- chk
       }
     }
   })
