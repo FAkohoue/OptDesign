@@ -102,7 +102,7 @@ alpha_lattice_chk <- function(trt_names = NULL, nrep, nblock, ntrt, rb, cb, chec
   }
 
   # Check if the number of non-control treatments can be divided among the blocks within a replicate
-  if ((ntrt %% nblock) != 0) {
+  if (mod(ntrt, nblock) != 0) {
     stop("The number of non-control treatments must be divisible by the number of blocks.")
   }
 
