@@ -19,7 +19,7 @@
 #' Call the function with control treatments
 #' trt_names <- as.character(1:100)
 
-#' alpha_lattice_chk(
+#' chk_alpha_lattice(
 #' trt_names = trt_names,
 #' nrep = 3,
 #' nblock = 5,
@@ -31,7 +31,7 @@
 #' )
 #'
 #'
-alpha_lattice_chk <- function(trt_names = NULL, nrep, nblock, ntrt, rb, cb, chk, trial = NULL) {
+chk_alpha_lattice <- function(trt_names = NULL, nrep, nblock, ntrt, rb, cb, chk, trial = NULL) {
 
   # Ensure the controls are a character vector
   controls <- as.character(chk)
