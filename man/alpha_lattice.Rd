@@ -56,7 +56,7 @@ alpha_lattice(trt_names = NULL, nrep, nblock, ntrt, rb, cb, trial = NULL)
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{\code{\link{Gmatrix}}, \code{\link{Rmatrix}}, \code{\link{SwapMethods}}, \code{\link{p_rep_design}}, \code{\link{alpha_lattice_chk}}
+\seealso{\code{\link{Gmatrix}}, \code{\link{Rmatrix}}, \code{\link{SwapMethods}}, \code{\link{p_rep_design}}, \code{\link{chk_alpha_lattice}}
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{

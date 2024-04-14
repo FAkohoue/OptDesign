@@ -53,7 +53,7 @@ VarCov_bRtR(matdf, criteria = "A", s2Bl = 0.1, Ginv = NULL, Rinv = NULL, K = NUL
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{\code{\link{p_rep_design}}, \code{\link{Gmatrix}}, \code{\link{Rmatrix}}, \code{\link{SwapMethods}}, \code{\link{alpha_lattice}}, \code{\link{alpha_lattice_chk}}
+\seealso{\code{\link{p_rep_design}}, \code{\link{Gmatrix}}, \code{\link{Rmatrix}}, \code{\link{SwapMethods}}, \code{\link{alpha_lattice}}, \code{\link{chk_alpha_lattice}}
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
