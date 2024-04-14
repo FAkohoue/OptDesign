@@ -73,7 +73,7 @@ p_rep_design <- function(trt_data = NULL,
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{\code{\link{Gmatrix}}, \code{\link{Rmatrix}}, \code{\link{SwapMethods}}, \code{\link{alpha_lattice}}
+\seealso{\code{\link{Gmatrix}}, \code{\link{Rmatrix}}, \code{\link{SwapMethods}}, \code{\link{alpha_lattice}}, \code{\link{alpha_lattice_chk}}
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
