@@ -77,6 +77,20 @@ p_rep_design <- function(trt_data = NULL,
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
+trt_names <- as.character(1:100)
+controls <- c('Control1', 'Control2', 'Control3', 'Control4')
+reptrt <- as.character(101:110)
+N1 <- 4 * 4
+N2 <- 4*1 + (100*1 + 10*2)/10
+p_rep_design(trt_data = trt_names,
+                         rep_trt_data = reptrt,
+                         check_data = controls,
+                         nblock = 10,
+                         test_trt = c(100,1),
+                         p_rep_trt = c(10,2),
+                         check_trt = c(4,10),
+                         rb = 4, cb = 4,
+                         trial = 'TOL')
 ##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
@@ -191,7 +205,7 @@ p_rep_design <- function(trt_data = NULL,
   row_num <- row_num[1:total_plots]
 
   # Generating column numbers
-  col_num <- rep(rep(1:cb, each = rb), times = ceiling(total_plots / (cb * rb)))
+  col_num <- rep(1:cb, times = rb * ceiling(total_plots / (cb * rb)))
   # Truncating column numbers to total_plots length
   col_num <- col_num[1:total_plots]
 
