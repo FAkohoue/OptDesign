@@ -99,7 +99,7 @@ alpha_lattice <- function(trt_names, nrep, nblock, ntrt, rb, cb, trial) {
   row_num <- rep(rep(1:rb, each = cb), times = nrep * nblock)
 
   # Generating column numbers
-  col_num <- rep(rep(1:cb, each = rb), times = nrep * nblock)
+  col_num <- rep(1:cb, times = rb * nrep * nblock)
 
   # Create the basic structure of the design
   design <- data.frame(
