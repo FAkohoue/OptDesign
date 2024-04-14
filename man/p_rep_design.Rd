@@ -193,7 +193,7 @@ p_rep_design <- function(trt_data = NULL,
   rep_num <- rep_num[1:total_plots]
 
   # Generating row numbers
-  r <- rep(1:rb, each = cb)
+  r <- rep(rep(1:rb, each = cb), times = ceiling(total_plots / (cb * rb)))
   row_num <- r
 
   while(length(row_num) < total_plots) {
