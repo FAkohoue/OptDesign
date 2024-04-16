@@ -1,14 +1,14 @@
-\name{SwapMethods}
-\alias{SwapMethods}
+\name{SwapMethods_alp}
+\alias{SwapMethods_alp}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Function to randomly swap pairs of treatments for optimization.
+\title{Function to randomly swap pairs of treatments for optimization of Alpa lattice design with repeated checks
 %%  ~~function to do ... ~~
 }
 \description{Randomly selects a block and a single or several pairs of treatments, swaps them and creates a new experimental layout.
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-SwapMethods(matdf, pairs = 1, swapmethod = "within")
+SwapMethods_alp(matdf, pairs = 1, swapmethod = "within")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -44,7 +44,7 @@ SwapMethods(matdf, pairs = 1, swapmethod = "within")
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{\code{\link{p_rep_design}}, \code{\link{Gmatrix}}, \code{\link{Rmatrix}}, \code{\link{alpha_lattice}}, \code{\link{chk_alpha_lattice}}, \code{\link{VarCov_bRtR}}, \code{\link{VarCov_bRtR_alp}}, \code{\link{SwapMethods_alp}}
+\seealso{\code{\link{p_rep_design}}, \code{\link{Gmatrix}}, \code{\link{Rmatrix}}, \code{\link{alpha_lattice}}, \code{\link{chk_alpha_lattice}}, \code{\link{VarCov_bRtR}}, \code{\link{VarCov_bRtR_alp}}, \code{\link{SwapMethods}}
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
@@ -54,7 +54,7 @@ SwapMethods(matdf, pairs = 1, swapmethod = "within")
 
 ## The function is currently defined as
 
-SwapMethods <- function(matdf, pairs=1, swapmethod="within") {
+SwapMethods_alp <- function(matdf, pairs=1, swapmethod="within") {
 
   trt <- max(matdf[,"Treatment"])
   gsize <- pairs*2
@@ -74,33 +74,33 @@ SwapMethods <- function(matdf, pairs=1, swapmethod="within") {
 
   # Swapping only within a block for any pair
   if (swapmethod == "within") {
-    b1 <- sample(mat$Rep, 1, replace = TRUE)  # Selects a block at random
+    b1 <- sample(mat$Block, 1, Blocklace = TRUE)  # Selects a block at random
 
     # Get the indices of the treatments within the selected block
-    b1_indices <- which(mat$Rep == b1)
-    # Sample gsize indices without replacement from the treatments in the selected block
-    g1_indices <- sample(b1_indices, gsize, replace = FALSE)
+    b1_indices <- which(mat$Block == b1)
+    # Sample gsize indices without Blocklacement from the treatments in the selected block
+    g1_indices <- sample(b1_indices, gsize, Blocklace = FALSE)
 
     # Perform the swaps
     temp <- mat$Treatment[g1_indices]
     temp[seq(1, gsize, 2)] <- mat$Treatment[g1_indices[seq(2, gsize, 2)]]
     temp[seq(2, gsize, 2)] <- mat$Treatment[g1_indices[seq(1, gsize, 2)]]
 
-    # Replace the treatments in the selected block with the swapped ones
+    # Blocklace the treatments in the selected block with the swapped ones
     mat$Treatment[g1_indices] <- temp
   }
 
   # Swapping across blocks for any pairs
   if (swapmethod == "across") {
-    blks <- sample(unique(mat$Rep), 2, replace = FALSE)
+    blks <- sample(unique(mat$Block), 2, Blocklace = FALSE)
 
     # Get the indices of the treatments within the selected blocks
-    blk1_indices <- which(mat$Rep == blks[1])
-    blk2_indices <- which(mat$Rep == blks[2])
+    blk1_indices <- which(mat$Block == blks[1])
+    blk2_indices <- which(mat$Block == blks[2])
 
-    # Sample half gsize indices without replacement from each block
-    g1_indices <- sample(blk1_indices, gsize/2, replace = FALSE)
-    g2_indices <- sample(blk2_indices, gsize/2, replace = FALSE)
+    # Sample half gsize indices without Blocklacement from each block
+    g1_indices <- sample(blk1_indices, gsize/2, Blocklace = FALSE)
+    g2_indices <- sample(blk2_indices, gsize/2, Blocklace = FALSE)
 
     # Perform the swaps
     temp1 <- mat$Treatment[g1_indices]

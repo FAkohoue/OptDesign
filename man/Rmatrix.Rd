@@ -53,7 +53,7 @@ Rmatrix(matdf, VarE=1, rhox=0, rhoy=0, nugget=0, regular=FALSE)
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{\code{\link{p_rep_design}}, \code{ \link{Gmatrix}}, \code{\link{SwapMethods}}, \code{\link{alpha_lattice}}, \code{\link{chk_alpha_lattice}}
+\seealso{\code{\link{p_rep_design}}, \code{ \link{Gmatrix}}, \code{\link{SwapMethods}}, \code{\link{alpha_lattice}}, \code{\link{chk_alpha_lattice}}, \code{\link{VarCov_bRtR}}, \code{\link{VarCov_bRtR_alp}}, \code{\link{SwapMethods_alp}}
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{

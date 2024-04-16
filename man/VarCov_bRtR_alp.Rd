@@ -1,5 +1,5 @@
-\name{VarCov_bRtR}
-\alias{VarCov_bRtR}
+\name{VarCov_bRtR_alp}
+\alias{VarCov_bRtR_alp}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Function to evaluate the efficieny of design optimization.
 %%  ~~function to do ... ~~
@@ -8,7 +8,7 @@
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-VarCov_bRtR(matdf, criteria = "A", s2Bl = 0.1, Ginv = NULL, Rinv = NULL, K = NULL)
+VarCov_bRtR_alp(matdf, criteria = "A", s2Bl = 0.1, Ginv = NULL, Rinv = NULL, K = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -53,7 +53,7 @@ VarCov_bRtR(matdf, criteria = "A", s2Bl = 0.1, Ginv = NULL, Rinv = NULL, K = NUL
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{\code{\link{p_rep_design}}, \code{\link{Gmatrix}}, \code{\link{Rmatrix}}, \code{\link{SwapMethods}}, \code{\link{alpha_lattice}}, \code{\link{chk_alpha_lattice}}, \code{\link{VarCov_bRtR_alp}}, \code{\link{SwapMethods_alp}}
+\seealso{\code{\link{p_rep_design}}, \code{\link{Gmatrix}}, \code{\link{Rmatrix}}, \code{\link{SwapMethods}}, \code{\link{alpha_lattice}}, \code{\link{chk_alpha_lattice}}, \code{\link{VarCov_bRtR}}, \code{\link{SwapMethods_alp}}
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
@@ -63,7 +63,7 @@ VarCov_bRtR(matdf, criteria = "A", s2Bl = 0.1, Ginv = NULL, Rinv = NULL, K = NUL
 
 ## The function is currently defined as
 
-VarCov_bRtR <- function(matdf, criteria="A", s2Bl=0.1, Ginv=NULL, Rinv=NULL, K=NULL) {
+VarCov_bRtR_alp <- function(matdf, criteria="A", s2Bl=0.1, Ginv=NULL, Rinv=NULL, K=NULL) {
   # Checking if Rinv and Ginv are not provided
   if(is.null(Rinv)){
     stop('Rinv was not provided')
@@ -73,7 +73,7 @@ VarCov_bRtR <- function(matdf, criteria="A", s2Bl=0.1, Ginv=NULL, Rinv=NULL, K=N
   }
 
   # Obtaining Z matrix
-  Z.block <- Matrix::sparse.model.matrix(~as.factor(matdf[,"Rep"]) - 1)
+  Z.block <- Matrix::sparse.model.matrix(~as.factor(matdf[,"Block"]) - 1)
   Z.trt <- Matrix::sparse.model.matrix(~as.factor(matdf[,"Treatment"]) - 1)
   Z <- cbind(Z.block,Z.trt)
   Z <- as.matrix(Z)
@@ -82,7 +82,7 @@ VarCov_bRtR <- function(matdf, criteria="A", s2Bl=0.1, Ginv=NULL, Rinv=NULL, K=N
   Rinv <- as.matrix(Rinv)
 
   # Definining the block diagonal G and obtaining Ginv
-  bb <- length(unique(matdf[,"Rep"]))  # Number of blocks
+  bb <- length(unique(matdf[,"Block"]))  # Number of blocks
   ng <- length(unique(matdf[,"Treatment"]))  # Number of treatments
   Ginv.block <- Gmatrix(ng=bb, VarG=s2Bl)   # Independent random effects with variance s2Bl
   Ginv.trt <- Matrix::drop0(round(Ginv,7))
