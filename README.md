@@ -4,7 +4,7 @@ An R package for generating improved experimental designs with spatially and gen
 # Installation in R
 # Install devtools
 devtools::install_github("hadley/devtools")
-# Install EasyExplore
+# Install OptDesign
 devtools::install_github("FAkohoue/OptDesign")
 
 # License
