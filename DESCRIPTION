@@ -6,7 +6,7 @@ Author: Félicien Akohoue
 Maintainer: Félicien Akohoue <akohoue.f@gmail.com>
 Description: This package contains functions that generate and optimize field designs for plant breeding trials to effenciently evaluate genetically correlated breeding lines. The design is optimized based on spatial correlation and genetic relationship between the genotypes.
     The function randomizes treatment assignments, ensures proper distribution of treatments within blocks, and corrects for any over-representation of replicated treatments. Finally, it generates a field plan dataframe with information about block, row, column, plot number, treatment assignment, and trial identifier.
-Depends: dplyr, agridat, desplot, MASS, Matrix, pracma
+Depends: dplyr, agridat, desplot, MASS, Matrix, pracma, data.table, tibble
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
