@@ -127,14 +127,15 @@ prep_famopt <- function(check_treatments, check_families,
   field_size <- n_rows * n_cols
   if (field_size != total_required) {
     if (warn_and_correct) {
-      warning(sprintf("Field size (%d rows × %d cols = %d plots) does not match required (%d). Adjusting layout dimensions...",
-                      n_rows, n_cols, field_size, total_required))
+
+      warning(paste0("Field size (", n_rows, " rows x ", n_cols, " cols = ",
+                     field_size, " plots) does not match required (", total_required, "). Adjusting layout dimensions..."))
       n_rows <- ceiling(sqrt(total_required))
       n_cols <- ceiling(total_required / n_rows)
       field_size <- n_rows * n_cols
     } else {
-      stop(sprintf("Provided field dimensions (%d plots) do not match the required (%d). Adjust n_rows or n_cols.",
-                   field_size, total_required))
+      stop(paste0("Provided field dimensions (", field_size, " plots) do not match the required (",
+                  total_required, "). Adjust `n_rows` or `n_cols`."))
     }
   }
 
