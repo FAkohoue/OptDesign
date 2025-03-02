@@ -107,7 +107,7 @@ prep_famopt <- function(check_treatments,
 \seealso{
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
-\examples{Create a p-rep design with 2 checks, 1 p-rep, and 1 unreplicated treatment in 3 blocks.
+\examples{## Create a p-rep design with 2 checks, 1 p-rep, and 1 unreplicated treatment in 3 blocks.
  check_treatments <- c("CheckA", "CheckB")
  check_families <- c("FamCheck1", "FamCheck2")   # Families for checks
  p_rep_treatments <- c("T1")                     # One partially replicated treatment
