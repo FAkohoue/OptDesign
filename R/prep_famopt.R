@@ -156,7 +156,7 @@ prep_famopt <- function(check_treatments, check_families,
     num_reps <- p_rep_reps[i]
 
     if (num_reps > length(available_blocks[[i]])) {
-      stop(sprintf("Error: Not enough unique blocks available for p-rep treatment '%s'.", treatment))
+      stop(paste0("Error: Not enough unique blocks available for p-rep treatment '", treatment, "'."))
     }
 
     assigned_blocks <- sample(available_blocks[[i]], num_reps)  # Select unique blocks
@@ -205,7 +205,8 @@ prep_famopt <- function(check_treatments, check_families,
     }
 
     if (!valid_order) {
-      warning(sprintf("Could not completely avoid adjacent families in block %d after %d attempts.", b, max_attempts))
+      warning(paste0("Could not completely avoid adjacent families in block ", b,
+                     " after ", max_attempts, " attempts."))
     }
 
     blocks[[b]] <- data.frame(Treatment = block_shuffled, Family = block_fam_shuffled, Block = b)
