@@ -119,7 +119,7 @@ prep_famopt <- function(check_treatments,
  n_rows <- 3
  n_cols <- 3
  set.seed(42)
- design <- create_prep_design(check_treatments, check_families,
+ design <- prep_famopt(check_treatments, check_families,
                               p_rep_treatments, p_rep_reps, p_rep_families,
                               unreplicated_treatments, unreplicated_families,
                               n_blocks, n_rows, n_cols, serpentine = TRUE, seed = NULL, attempts = 1000)

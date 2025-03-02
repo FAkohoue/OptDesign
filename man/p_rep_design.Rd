@@ -76,6 +76,7 @@ p_rep_design <- function(trt_data = NULL,
 \seealso{\code{\link{Gmatrix}}, \code{\link{Rmatrix}}, \code{\link{SwapMethods}}, \code{\link{alpha_lattice}}, \code{\link{chk_alpha_lattice}}, \code{\link{VarCov_bRtR}}, \code{\link{VarCov_bRtR_alp}, \code{\link{SwapMethods_alp}}
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
+}
 \examples{
 trt_names <- as.character(1:100)
 controls <- c('Control1', 'Control2', 'Control3', 'Control4')
@@ -91,6 +92,7 @@ p_rep_design(trt_data = trt_names,
                          check_trt = c(4,10),
                          rb = 4, cb = 4,
                          trial = 'TOL')
+
 ##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
