@@ -1,95 +1,96 @@
 \name{prep_famopt}
 \alias{prep_famopt}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Create a Partially Replicated (p-rep) Experimental Design Layout
 }
-\description{This function generates a partially replicated (p-rep) experimental design for field trials, ensuring that check treatments are balanced across blocks, p-rep (partially replicated) and unreplicated treatments are distributed evenly,
-and similar families of treatments are not placed in adjacent positions. It also supports an optional serpentine layout for plot numbering and can auto-correct layout dimensions.
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+\description{
+This function generates a partially replicated (p-rep) experimental design for field trials, ensuring that check treatments are balanced across blocks,
+p-rep (partially replicated) and unreplicated treatments are distributed evenly, and similar families of treatments are not placed in adjacent positions.
+It also supports an optional serpentine layout for plot numbering and can auto-correct layout dimensions.
 }
 \usage{
-prep_famopt <- function(check_treatments,
-                        check_families,
-                        p_rep_treatments,
-                        p_rep_reps,
-                        p_rep_families,
-                        unreplicated_treatments,
-                        unreplicated_families,
-                        n_blocks, n_rows, n_cols,
-                        serpentine = FALSE,
-                        seed = NULL,
-                        attempts = 100,
-                        warn_and_correct = TRUE)
+prep_famopt(check_treatments, check_families, p_rep_treatments, p_rep_reps,
+            p_rep_families, unreplicated_treatments, unreplicated_families,
+            n_blocks, n_rows, n_cols, serpentine = FALSE, seed = NULL,
+            attempts = 100, warn_and_correct = TRUE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{check_treatments}{Character vector of **check treatment** identifiers. Each check will appear exactly once in each block (fully replicated across blocks).
-%%     ~~Describe \code{x} here~~
-}
- \item{check_families}{Character vector of the same length as `check_treatments` specifying the family for each check treatment.
-%%     ~~Describe \code{x} here~~
-}
-  \item{p_rep_treatments}{Character vector of **partially replicated treatment** identifiers. These treatments have replication counts less than or equal to the number of blocks.
-%%     ~~Describe \code{x} here~~
-}
-  \item{p_rep_reps}{Integer vector indicating the number of replicates for each treatment in `p_rep_treatments`. Must be the same length as `p_rep_treatments`. Each value should be ≤ `n_blocks` (each p-rep treatment can appear at most once per block).
-%%     ~~Describe \code{x} here~~
-}
-  \item{p_rep_families}{Character vector of the same length as `p_rep_treatments` specifying the family for each p-rep treatment.
-%%     ~~Describe \code{x} here~~
-}
- \item{unreplicated_treatments}{Character vector of **unreplicated treatment** identifiers. Each unreplicated treatment appears exactly once in the entire experiment.
-%%     ~~Describe \code{x} here~~
-}
-  \item{unreplicated_families}{Character vector of the same length as `unreplicated_treatments` specifying the family for each unreplicated treatment.
-%%     ~~Describe \code{x} here~~
-}
-  \item{n_blocks}{Integer number of blocks (replicates). Each check treatment will appear in every block exactly once. Block count should be ≥ 1.
-%%     ~~Describe \code{x} here~~
-}
- \item{n_rows}{Integer number of rows in the field layout.
-%%     ~~Describe \code{x} here~~
-}
-  \item{n_cols}{Integer number of columns in the field layout.
-%%     ~~Describe \code{x} here~~
-}
-  \item{serpentine}{Logical, whether to use serpentine plot layout. If `TRUE`, plot numbering (and filling of treatments) will snake through the field: left-to-right in the first row, then right-to-left in the second, and so on. If `FALSE`, plot numbering proceeds left-to-right for every row.
-%%     ~~Describe \code{x} here~~
-}
-  \item{seed}{Optional integer seed for random number generation. Use this for reproducible randomization.
-%%     ~~Describe \code{x} here~~
-}
- \item{attempts}{Number of iterations for family distribution across blocks.
-%%     ~~Describe \code{x} here~~
-}
-  \item{warn_and_correct}{Logical indicating whether to automatically adjust `n_rows` and `n_cols` if the provided layout dimensions do not match the required number of plots.
-  If `TRUE`, the function will issue a warning and adjust the dimensions to fit the exact number of plots needed. If `FALSE`, a warning is issued and the function will require the user to correct the input (no automatic adjustment; the function will stop if the dimensions are inconsistent).
-%%     ~~Describe \code{x} here~~
-}
-}
-\details{**Design Constraints and Features:**
-            - **Balanced Check Treatments:** Each check treatment is placed exactly once in each block. The checks are randomized across blocks such that every block contains all check treatments exactly once, ensuring balance of checks across blocks.
-            - **Partially Replicated (p-rep) Treatments:** P-rep treatments have replication counts less than or equal to the number of blocks. The design ensures no p-rep treatment appears more than once within the same block. Replicates of each p-rep treatment are spread across different blocks as evenly as possible (e.g., a treatment with 2 replicates in a 4-block design will be present in 2 of the 4 blocks, chosen at random).
-            - **Unreplicated Treatments:** Each treatment listed in `unreplicated_treatments` is included exactly once in the entire experiment (one replicate total). These unreplicated entries are assigned to blocks such that they are spread across blocks rather than clustered. The function attempts to distribute unreplicated treatments across distinct blocks, so no block is overloaded with unreplicated entries while others have none (unless the number of unreplicated treatments is less than the number of blocks, in which case each unreplicated still goes into a separate block).
-            - **Avoid Adjacent Similar Families:** Within each block, treatments from the same family are not placed in adjacent plot positions. This means that when arranging the sequence of treatments within a block, the function will ensure that no two consecutive plots (in the block's planting order) contain treatments from the same family. This helps achieve a more uniform spatial distribution of families and minimizes clustering of similar genotypes. If a block's composition makes this impossible (for example, too many treatments from one family in a single block), the function will issue a warning and still attempt to minimize family adjacency.
-            - **Spatial Optimization:** The randomization is done in a way to reduce clustering of treatments from the same family across the field. By balancing replicates across blocks and avoiding within-block adjacencies, the design inherently minimizes clusters of related treatments while maintaining randomness. Each block is filled with a random order of treatments (respecting the above constraints), and blocks can be arranged contiguously in the field. The user-specified `serpentine` option can further influence the neighbor relationships of plots. Overall, the layout is random yet balanced, aiming to avoid large patches of the same family.
-            - **Serpentine Layout:** If `serpentine = TRUE`, the assignment of treatments to the field follows a serpentine path. This means that odd-numbered rows are filled left-to-right, while even-numbered rows are filled right-to-left. This layout is often used to facilitate field operations by having a continuous snake-like planting order. If `serpentine = FALSE`, each row is filled left-to-right in the same orientation. The field book `Plot` numbers will reflect this ordering.
-            - **Reproducibility via Seed:** By specifying the `seed` parameter, users can obtain the same randomization and layout across runs. All random operations (block assignments, treatment shuffling, etc.) will use this seed for reproducibility.
-            - **Automatic Layout Correction:** If the provided `n_rows` and `n_cols` do not exactly accommodate all the required plots (which is determined by the total number of treatment placements needed), the function can adjust the layout. When `warn_and_correct = TRUE`, the function will automatically modify `n_rows` and/or `n_cols` to ensure that `n_rows * n_cols` equals the total number of plots required by the design, and issue a warning describing the adjustment. It will choose a layout close to the user input if possible. If `warn_and_correct = FALSE` and the dimensions are inconsistent with the number of treatments, the function will issue a warning and stop, requiring the user to adjust `n_rows` or `n_cols` manually so that the field has the correct size.
+  \item{check_treatments}{A character vector of check treatment identifiers. Each check treatment appears exactly once in each block, ensuring full replication across blocks.}
 
-          **Input Validation:** The function checks that inputs are consistent:
-            - It verifies that the length of family vectors match the corresponding treatment vectors, replication counts are valid (e.g., no p-rep replication exceeds `n_blocks`), and that the total number of plots required matches the field dimensions (adjusting or warning as needed).
+  \item{check_families}{A character vector of the same length as \code{check_treatments}, specifying the family for each check treatment.}
 
-          **Output Format:** The function returns a list with two components:
-              1. **layout_matrix**: A matrix (of size `n_rows` x `n_cols`) representing the field layout. Each entry is the Treatment identifier assigned to that plot position. Blocks are laid out in contiguous sections of the matrix (typically whole rows or sets of rows per block). Check treatments can be observed to appear once per block (e.g., once per block section in the layout).
-              2. **field_book**: A data frame (tibble) with columns `Plot`, `Block`, `Row`, `Column`, `Treatment`, and `Family`. Each row of this data frame corresponds to a plot in the field. `Plot` is the plot number (starting from 1, incrementing in serpentine or row-major order according to `serpentine` setting), `Block` is the block (replicate) number, `Row` and `Column` give the position coordinates, `Treatment` is the treatment identifier, and `Family` is the family of that treatment. The data frame is sorted by `Plot` order (the order in which plots would be planted/numbered in the field).
-%%  ~~ If necessary, more details than the description above ~~
+  \item{p_rep_treatments}{A character vector of partially replicated (p-rep) treatment identifiers. These treatments have replication counts less than or equal to the number of blocks.}
+
+  \item{p_rep_reps}{An integer vector indicating the number of replicates for each treatment in \code{p_rep_treatments}.
+  Must be the same length as \code{p_rep_treatments}, and each value should be \eqn{\leq} \code{n_blocks} (each p-rep treatment can appear at most once per block).}
+
+  \item{p_rep_families}{A character vector of the same length as \code{p_rep_treatments}, specifying the family for each p-rep treatment.}
+
+  \item{unreplicated_treatments}{A character vector of unreplicated treatment identifiers. Each unreplicated treatment appears exactly once in the entire experiment.}
+
+  \item{unreplicated_families}{A character vector of the same length as \code{unreplicated_treatments}, specifying the family for each unreplicated treatment.}
+
+  \item{n_blocks}{An integer specifying the number of blocks (replicates). Each check treatment will appear in every block exactly once. \code{n_blocks} should be at least 1.}
+
+  \item{n_rows}{An integer specifying the number of rows in the field layout.}
+
+  \item{n_cols}{An integer specifying the number of columns in the field layout.}
+
+  \item{serpentine}{A logical value indicating whether to use a serpentine plot layout.
+  If \code{TRUE}, plot numbering (and filling of treatments) follows a snake-like pattern: left-to-right in the first row, right-to-left in the second row, and so on.
+  If \code{FALSE}, plot numbering proceeds left-to-right for every row.}
+
+  \item{seed}{An optional integer for setting the random seed to ensure reproducibility of the design.}
+
+  \item{attempts}{An integer specifying the maximum number of iterations for optimizing family distribution across blocks.}
+
+  \item{warn_and_correct}{A logical value indicating whether to automatically adjust \code{n_rows} and \code{n_cols}
+  if the provided layout dimensions do not match the required number of plots.
+  If \code{TRUE}, the function will issue a warning and adjust the dimensions to fit the exact number of plots needed.
+  If \code{FALSE}, the function will stop execution and require the user to manually correct the input.}
 }
-\return A list with two elements:
- \describe{
-   \item{layout_matrix}{A matrix of size `n_rows` x `n_cols` containing treatment identifiers arranged according to the design layout.}
-   \item{field_book}{A data frame with columns `Plot`, `Block`, `Row`, `Column`, `Treatment`, `Family` describing each plot in the field layout.}
+\details{
+\strong{Design Constraints and Features:}
+\itemize{
+  \item \strong{Balanced Check Treatments:} Each check treatment is placed exactly once in each block. The checks are randomized across blocks such that every block contains all check treatments exactly once, ensuring balance of checks across blocks.
+
+  \item \strong{Partially Replicated (p-rep) Treatments:} P-rep treatments have replication counts less than or equal to the number of blocks. The design ensures no p-rep treatment appears more than once within the same block. Replicates of each p-rep treatment are spread across different blocks as evenly as possible (e.g., a treatment with 2 replicates in a 4-block design will be present in 2 of the 4 blocks, chosen at random).
+
+  \item \strong{Unreplicated Treatments:} Each treatment listed in \code{unreplicated_treatments} is included exactly once in the entire experiment (one replicate total). These unreplicated entries are assigned to blocks such that they are spread across blocks rather than clustered. The function attempts to distribute unreplicated treatments across distinct blocks, so no block is overloaded with unreplicated entries while others have none (unless the number of unreplicated treatments is less than the number of blocks, in which case each unreplicated treatment still goes into a separate block).
+
+  \item \strong{Avoid Adjacent Similar Families:} Within each block, treatments from the same family are not placed in adjacent plot positions. This means that when arranging the sequence of treatments within a block, the function ensures that no two consecutive plots (in the block's planting order) contain treatments from the same family. If a block's composition makes this impossible (e.g., too many treatments from one family in a single block), the function will issue a warning and attempt to minimize family adjacency.
+
+  \item \strong{Spatial Optimization:} The randomization is done in a way that reduces clustering of treatments from the same family across the field. Each block is filled with a random order of treatments (respecting the above constraints), and blocks can be arranged contiguously in the field. The user-specified \code{serpentine} option can influence the neighbor relationships of plots.
+
+  \item \strong{Serpentine Layout:} If \code{serpentine = TRUE}, the assignment of treatments to the field follows a serpentine path. This means that odd-numbered rows are filled left-to-right, while even-numbered rows are filled right-to-left. If \code{serpentine = FALSE}, each row is filled left-to-right in the same orientation.
+
+  \item \strong{Reproducibility via Seed:} By specifying the \code{seed} parameter, users can obtain the same randomization and layout across runs.
+
+  \item \strong{Automatic Layout Correction:} If the provided \code{n_rows} and \code{n_cols} do not exactly accommodate all the required plots, the function can adjust the layout. When \code{warn_and_correct = TRUE}, the function will automatically modify \code{n_rows} and/or \code{n_cols} to ensure that \code{n_rows * n_cols} equals the total number of plots required.
+}
+
+\strong{Input Validation:}
+The function checks that inputs are consistent:
+\itemize{
+  \item Verifies that the length of family vectors matches the corresponding treatment vectors.
+  \item Ensures replication counts are valid (e.g., no p-rep replication exceeds \code{n_blocks}).
+  \item Confirms that the total number of plots required matches the field dimensions (adjusting or warning as needed).
+}
+
+\strong{Output Format:}
+The function returns a list with two components:
+\enumerate{
+  \item \strong{layout_matrix}: A matrix (of size \code{n_rows} x \code{n_cols}) representing the field layout. Each entry is the Treatment identifier assigned to that plot position.
+  \item \strong{field_book}: A data frame (tibble) with columns \code{Plot}, \code{Block}, \code{Row}, \code{Column}, \code{Treatment}, and \code{Family}. Each row corresponds to a plot in the field, sorted by \code{Plot} order.
+}
+}
+
+\value{
+A list with two elements:
+\describe{
+   \item{layout_matrix}{A matrix of size \code{n_rows} x \code{n_cols} containing treatment identifiers arranged according to the design layout.}
+   \item{field_book}{A data frame with columns \code{Plot}, \code{Block}, \code{Row}, \code{Column}, \code{Treatment}, \code{Family} describing each plot in the field layout.}
+}
 }
 
 \references{Félicien Akohoue
@@ -215,7 +216,8 @@ prep_famopt <- function(check_treatments,
 
     # Add p-rep treatments assigned to this block
     for (treatment in names(p_rep_assignments)) {
-      if (b %in% p_rep_assignments[[treatment]]) {
+      if (b %in% p_rep_assignments[[treatment]])
+      {
         block_treatments <- c(block_treatments, treatment)
         block_families <- c(block_families, p_rep_families[which(p_rep_treatments == treatment)])
       }
@@ -258,7 +260,8 @@ prep_famopt <- function(check_treatments,
   # Apply serpentine layout if required
   if (serpentine) {
     for (r in seq_len(n_rows)) {
-      if (r %% 2 == 0) {
+      if (r %% 2 == 0)
+      {
         final_data$Column[final_data$Row == r] <- rev(final_data$Column[final_data$Row == r])
       }
     }
@@ -267,7 +270,8 @@ prep_famopt <- function(check_treatments,
   # Create layout matrix in correct serpentine order
   layout_matrix <- matrix(NA, nrow = n_rows, ncol = n_cols)
   for (r in seq_len(n_rows)) {
-    if (serpentine && (r %% 2 == 0)) {
+    if (serpentine && (r %% 2 == 0))
+    {
       layout_matrix[r, ] <- rev(final_data$Treatment[final_data$Row == r])
     } else {
       layout_matrix[r, ] <- final_data$Treatment[final_data$Row == r]

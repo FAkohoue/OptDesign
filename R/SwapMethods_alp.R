@@ -28,53 +28,52 @@
 #' @export
 #' @seealso \code{\link{rcbd}}
 #'
-SwapMethods_alp <- function(matdf, pairs=1, swapmethod="within") {
+SwapMethods_alp <- function(matdf, pairs = 1, swapmethod = "within") {
 
   trt <- max(matdf[,"Treatment"])
-  gsize <- pairs*2
+  gsize <- pairs * 2
   stopifnot(gsize %% 2 == 0)
   if (gsize > trt) {
     stop("Number of swaps is larger than the number of Treatments")
   }
 
-  # Swapping any blocks any pairs
+  # Randomly selecting a swap method if swapmethod == "any"
   if (swapmethod == "any") {
-    list <- c('within', 'across')
-    sel <- sample(list, 1)
-    swapmethod <- sel
+    swapmethod <- sample(c("within", "across"), 1)  # Selects randomly from 'within' or 'across'
   }
 
   mat <- as.data.frame(matdf, row.names = NULL)
 
   # Swapping only within a block for any pair
   if (swapmethod == "within") {
-    b1 <- sample(mat$Block, 1, Blocklace = TRUE)  # Selects a block at random
+    b1 <- sample(mat$Block, 1, replace = TRUE)  # Selects a block at random
 
     # Get the indices of the treatments within the selected block
     b1_indices <- which(mat$Block == b1)
-    # Sample gsize indices without Blocklacement from the treatments in the selected block
-    g1_indices <- sample(b1_indices, gsize, Blocklace = FALSE)
+
+    # Sample gsize indices without replacement from the treatments in the selected block
+    g1_indices <- sample(b1_indices, gsize, replace = FALSE)
 
     # Perform the swaps
     temp <- mat$Treatment[g1_indices]
     temp[seq(1, gsize, 2)] <- mat$Treatment[g1_indices[seq(2, gsize, 2)]]
     temp[seq(2, gsize, 2)] <- mat$Treatment[g1_indices[seq(1, gsize, 2)]]
 
-    # Blocklace the treatments in the selected block with the swapped ones
+    # Replace the treatments in the selected block with the swapped ones
     mat$Treatment[g1_indices] <- temp
   }
 
   # Swapping across blocks for any pairs
   if (swapmethod == "across") {
-    blks <- sample(unique(mat$Block), 2, Blocklace = FALSE)
+    blks <- sample(unique(mat$Block), 2, replace = FALSE)
 
     # Get the indices of the treatments within the selected blocks
     blk1_indices <- which(mat$Block == blks[1])
     blk2_indices <- which(mat$Block == blks[2])
 
-    # Sample half gsize indices without Blocklacement from each block
-    g1_indices <- sample(blk1_indices, gsize/2, Blocklace = FALSE)
-    g2_indices <- sample(blk2_indices, gsize/2, Blocklace = FALSE)
+    # Sample half gsize indices without replacement from each block
+    g1_indices <- sample(blk1_indices, gsize/2, replace = FALSE)
+    g2_indices <- sample(blk2_indices, gsize/2, replace = FALSE)
 
     # Perform the swaps
     temp1 <- mat$Treatment[g1_indices]
@@ -84,7 +83,8 @@ SwapMethods_alp <- function(matdf, pairs=1, swapmethod="within") {
   }
 
   # Check if 'Row' and 'Col' columns exist before sorting
-  if ("Row" %in% names(mat) && "Col" %in% names(mat)) {
+  if ("Row" %in% names(mat) && "Col" %in% names(mat))
+  {
     return(mat[order(mat[,"Row"], mat[,"Col"]), ])
   } else {
     return(mat)

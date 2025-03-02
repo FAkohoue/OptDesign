@@ -1,106 +1,132 @@
 \name{SwapMethods_alp}
 \alias{SwapMethods_alp}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{Function to randomly swap pairs of treatments for optimization of Alpa lattice design with repeated checks
-%%  ~~function to do ... ~~
-}
-\description{Randomly selects a block and a single or several pairs of treatments, swaps them and creates a new experimental layout.
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+\title{Function to Randomly Swap Pairs of Treatments in an Alpha Lattice Design}
+\description{
+This function randomly selects a block and swaps one or more pairs of treatments to optimize an Alpha lattice experimental design with repeated checks.
+The function supports within-block and across-block swaps to improve spatial randomization.
 }
 \usage{
 SwapMethods_alp(matdf, pairs = 1, swapmethod = "within")
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{matdf}{An experimental design (layout) based on a randomized complete block designs (RCBD) or incomplete block designs (IBD).
-%%     ~~Describe \code{x} here~~
-}
-  \item{pairs}{Number of pairs of treatments to be swapped in the run.
-%%     ~~Describe \code{x} here~~
-}
-  \item{swapmethod}{Selected method to be used. This can be "within" which the default (that should be used for randomized complete block designs) or "across" or "any" which can be used for incomplete blocks or unbalanced designs.
-%%     ~~Describe \code{x} here~~
-}
+  \item{matdf}{A data frame representing an experimental design layout based on a randomized complete block design (RCBD) or an incomplete block design (IBD).
+  The data frame should contain at least the columns: \code{Block}, \code{Treatment}, and optionally \code{Row} and \code{Col}.}
+
+  \item{pairs}{An integer specifying the number of treatment pairs to swap in the run. Each pair consists of two treatments that will be exchanged in the layout.}
+
+  \item{swapmethod}{A character string specifying the swap method. Options are:
+    \describe{
+      \item{\code{"within"}}{Swaps occur only within a single block (recommended for RCBD).}
+      \item{\code{"across"}}{Swaps occur between two different blocks (recommended for unbalanced designs).}
+      \item{\code{"any"}}{Randomly selects between \code{"within"} and \code{"across"} for each swap.}
+    }
+  The default is \code{"within"}.}
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
-}
-\value{an new experimental design with swapped pairs of treatments with the 4 columns: Row, Col, Rep, Treatment
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{Mramba, L.K. and Gezan, S.A. (2015), Optimal Randomized Complete Block Designs for Spatially and Genetically Correlated Data using Mixed Models, Journal of Agricultural, Biological and Environmental Statistics, 150, 1-32.
-%% ~put references to the literature/web site here ~
-}
-\author{Lazarus Mramba & Salvador Gezan
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
+This function is designed to improve the spatial distribution of treatments within an experimental design. The goal is to minimize local clustering of treatments while maintaining the structure of the original design.
+
+\strong{Swapping Mechanism:}
+\itemize{
+  \item For \code{"within"}, the function randomly selects one block and swaps \code{pairs} of treatments within that block.
+  \item For \code{"across"}, the function selects two blocks and swaps treatments between them.
+  \item For \code{"any"}, the function randomly chooses between \code{"within"} and \code{"across"} at each iteration.
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{\code{\link{p_rep_design}}, \code{\link{Gmatrix}}, \code{\link{Rmatrix}}, \code{\link{alpha_lattice}}, \code{\link{chk_alpha_lattice}}, \code{\link{VarCov_bRtR}}, \code{\link{VarCov_bRtR_alp}}, \code{\link{SwapMethods}}
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\strong{Assumptions:}
+\itemize{
+  \item The input \code{matdf} should contain a column \code{Block} that identifies the block assignments.
+  \item The column \code{Treatment} should be numeric or character identifiers for the treatments.
+  \item If the columns \code{Row} and \code{Col} are present, the returned object will be sorted accordingly.
+}
+}
+\value{
+A data frame with the same structure as \code{matdf}, but with the specified swaps applied.
+The returned data frame contains:
+  \itemize{
+    \item \code{Row}: (Optional) Row number in the field layout.
+    \item \code{Col}: (Optional) Column number in the field layout.
+    \item \code{Block}: Block assignment.
+    \item \code{Treatment}: Treatment identifier, modified with swapped values.
+  }
+}
+\references{
+Mramba, L.K. and Gezan, S.A. (2015). "Optimal Randomized Complete Block Designs for Spatially and Genetically Correlated Data Using Mixed Models," Journal of Agricultural, Biological and Environmental Statistics, 150, 1-32.
+}
+\author{
+Lazarus Mramba \email{lazarus.mramba@example.com} and Salvador Gezan \email{salvador.gezan@example.com}
+}
+\seealso{
+\code{\link{p_rep_design}}, \code{\link{alpha_lattice}}, \code{\link{SwapMethods}}
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
+# Simulated example dataset
+set.seed(123)
+example_df <- data.frame(
+  Block = rep(1:4, each = 5),
+  Treatment = sample(1:20, 20, replace = FALSE),
+  Row = rep(1:5, times = 4),
+  Col = rep(1:4, each = 5)
+)
 
-SwapMethods_alp <- function(matdf, pairs=1, swapmethod="within") {
+# Swap 2 pairs within a block
+new_design <- SwapMethods_alp(example_df, pairs = 2, swapmethod = "within")
+
+# Swap across blocks
+new_design_across <- SwapMethods_alp(example_df, pairs = 2, swapmethod = "across")
+
+# Swap using a random method
+new_design_any <- SwapMethods_alp(example_df, pairs = 2, swapmethod = "any")
+
+# View results
+head(new_design)
+
+SwapMethods_alp <- function(matdf, pairs = 1, swapmethod = "within") {
 
   trt <- max(matdf[,"Treatment"])
-  gsize <- pairs*2
+  gsize <- pairs * 2
   stopifnot(gsize %% 2 == 0)
   if (gsize > trt) {
     stop("Number of swaps is larger than the number of Treatments")
   }
 
-  # Swapping any blocks any pairs
+  # Randomly selecting a swap method if swapmethod == "any"
   if (swapmethod == "any") {
-    list <- c('within', 'across')
-    sel <- sample(list, 1)
-    swapmethod <- sel
+    swapmethod <- sample(c("within", "across"), 1)  # Selects randomly from 'within' or 'across'
   }
 
   mat <- as.data.frame(matdf, row.names = NULL)
 
   # Swapping only within a block for any pair
   if (swapmethod == "within") {
-    b1 <- sample(mat$Block, 1, Blocklace = TRUE)  # Selects a block at random
+    b1 <- sample(mat$Block, 1, replace = TRUE)  # Selects a block at random
 
     # Get the indices of the treatments within the selected block
     b1_indices <- which(mat$Block == b1)
-    # Sample gsize indices without Blocklacement from the treatments in the selected block
-    g1_indices <- sample(b1_indices, gsize, Blocklace = FALSE)
+
+    # Sample gsize indices without replacement from the treatments in the selected block
+    g1_indices <- sample(b1_indices, gsize, replace = FALSE)
 
     # Perform the swaps
     temp <- mat$Treatment[g1_indices]
     temp[seq(1, gsize, 2)] <- mat$Treatment[g1_indices[seq(2, gsize, 2)]]
     temp[seq(2, gsize, 2)] <- mat$Treatment[g1_indices[seq(1, gsize, 2)]]
 
-    # Blocklace the treatments in the selected block with the swapped ones
+    # Replace the treatments in the selected block with the swapped ones
     mat$Treatment[g1_indices] <- temp
   }
 
   # Swapping across blocks for any pairs
   if (swapmethod == "across") {
-    blks <- sample(unique(mat$Block), 2, Blocklace = FALSE)
+    blks <- sample(unique(mat$Block), 2, replace = FALSE)
 
     # Get the indices of the treatments within the selected blocks
     blk1_indices <- which(mat$Block == blks[1])
     blk2_indices <- which(mat$Block == blks[2])
 
-    # Sample half gsize indices without Blocklacement from each block
-    g1_indices <- sample(blk1_indices, gsize/2, Blocklace = FALSE)
-    g2_indices <- sample(blk2_indices, gsize/2, Blocklace = FALSE)
+    # Sample half gsize indices without replacement from each block
+    g1_indices <- sample(blk1_indices, gsize/2, replace = FALSE)
+    g2_indices <- sample(blk2_indices, gsize/2, replace = FALSE)
 
     # Perform the swaps
     temp1 <- mat$Treatment[g1_indices]
@@ -110,11 +136,13 @@ SwapMethods_alp <- function(matdf, pairs=1, swapmethod="within") {
   }
 
   # Check if 'Row' and 'Col' columns exist before sorting
-  if
-  if ("Row" %in% names(mat) && "Col" %in% names(mat)){
+  if ("Row" %in% names(mat) && "Col" %in% names(mat))
+  {
     return(mat[order(mat[,"Row"], mat[,"Col"]), ])
   } else {
-    return(mat)}
+    return(mat)
+  }
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory (show via RShowDoc("KEYWORDS")):
