@@ -176,7 +176,7 @@ prep_famopt <- function(check_treatments, check_families,
 
     # Add p-rep treatments assigned to this block
     for (treatment in names(p_rep_assignments)) {
-      if (b %in% p_rep_assignments[[treatment]]) {
+      if (is.element(b, p_rep_assignments[[treatment]])) {
         block_treatments <- c(block_treatments, treatment)
         block_families <- c(block_families, p_rep_families[which(p_rep_treatments == treatment)])
       }
@@ -220,7 +220,7 @@ prep_famopt <- function(check_treatments, check_families,
   # Apply serpentine layout if required
   if (serpentine) {
     for (r in seq_len(n_rows)) {
-      if (r %% 2 == 0) {
+      if (mod(r, 2) == 0) {
         final_data$Column[final_data$Row == r] <- rev(final_data$Column[final_data$Row == r])
       }
     }
@@ -229,7 +229,7 @@ prep_famopt <- function(check_treatments, check_families,
   # Create layout matrix in correct serpentine order
   layout_matrix <- matrix(NA, nrow = n_rows, ncol = n_cols)
   for (r in seq_len(n_rows)) {
-    if (serpentine && (r %% 2 == 0)) {
+    if (serpentine && (mod(r, 2) == 0)) {
       layout_matrix[r, ] <- rev(final_data$Treatment[final_data$Row == r])
     } else {
       layout_matrix[r, ] <- final_data$Treatment[final_data$Row == r]
