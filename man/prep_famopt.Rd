@@ -124,7 +124,7 @@ A list with two elements:
                               p_rep_treatments, p_rep_reps, p_rep_families,
                               unreplicated_treatments, unreplicated_families,
                               n_blocks, n_rows, n_cols, serpentine = TRUE, seed = NULL, attempts = 1000)
-
+print(design)
 ##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,
 ##--	or standard data sets, see data().
