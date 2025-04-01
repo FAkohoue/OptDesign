@@ -131,19 +131,15 @@ print(design)
 
 ## The function is currently defined as
 
-prep_famopt <- function(check_treatments,
-                      check_families,
-                      p_rep_treatments, p_rep_reps,
-                      p_rep_families,
-                      unreplicated_treatments,
-                      unreplicated_families,
-                      n_blocks, n_rows, n_cols,
-                      serpentine = FALSE, seed = NULL,
-                      attempts = 100, warn_and_correct = TRUE) {
+prep_famopt <- function(check_treatments, check_families,
+                        p_rep_treatments, p_rep_reps, p_rep_families,
+                        unreplicated_treatments, unreplicated_families,
+                        n_blocks, n_rows, n_cols,
+                        serpentine = FALSE, seed = NULL, attempts = 100, warn_and_correct = TRUE) {
   if (!is.null(seed)) {
     set.seed(seed)
   }
-
+  
   if (length(check_treatments) != length(check_families)) {
     stop("Length of check_families must match length of check_treatments.")
   }
@@ -159,17 +155,15 @@ prep_famopt <- function(check_treatments,
   if (n_blocks < 1) {
     stop("n_blocks must be at least 1.")
   }
-
+  
   total_checks <- n_blocks * length(check_treatments)
   total_prep <- sum(p_rep_reps)
   total_unrep <- length(unreplicated_treatments)
   total_required <- total_checks + total_prep + total_unrep
-
+  
   field_size <- n_rows * n_cols
-
   if (field_size != total_required) {
     if (warn_and_correct) {
-
       warning(paste0("Field size (", n_rows, " rows x ", n_cols, " cols = ",
                      field_size, " plots) does not match required (", total_required, "). Adjusting layout dimensions..."))
       n_rows <- ceiling(sqrt(total_required))
@@ -177,107 +171,113 @@ prep_famopt <- function(check_treatments,
       field_size <- n_rows * n_cols
     } else {
       stop(paste0("Provided field dimensions (", field_size, " plots) do not match the required (",
-                  total_required, "). Adjust `n_rows` or `n_cols`."))
+                  total_required, "). Adjust `n_rows` or `n_cols`.")) 
     }
-    }
-
+  }
+  
+  # Create a lookup mapping for treatments to families
+  family_lookup <- setNames(
+    c(check_families, p_rep_families, unreplicated_families),
+    c(check_treatments, p_rep_treatments, unreplicated_treatments)
+  )
+  
   # Initialize empty block list
   blocks <- vector("list", n_blocks)
-
+  
   # Assign p-rep treatments to unique blocks
   p_rep_assignments <- vector("list", length(p_rep_treatments))
   names(p_rep_assignments) <- p_rep_treatments
-
+  
   available_blocks <- vector("list", length(p_rep_treatments))
   for (i in seq_along(p_rep_treatments)) {
     available_blocks[[i]] <- sample(seq_len(n_blocks))  # Random block order
   }
-
+  
   for (i in seq_along(p_rep_treatments)) {
     treatment <- p_rep_treatments[i]
     num_reps <- p_rep_reps[i]
-
+    
     if (num_reps > length(available_blocks[[i]])) {
-      stop(paste0("Error: Not enough unique blocks available for p-rep treatment '", treatment, "'."))
+      stop(paste0("Error: Not enough unique blocks available for p-rep treatment '", treatment, "'.")) 
     }
-
+    
     assigned_blocks <- sample(available_blocks[[i]], num_reps)  # Select unique blocks
     available_blocks[[i]] <- setdiff(available_blocks[[i]], assigned_blocks)  # Remove used blocks
-
+    
     p_rep_assignments[[treatment]] <- assigned_blocks
   }
-
+  
   # Shuffle and distribute unreplicated treatments across blocks
   unrep_treatments_shuffled <- sample(unreplicated_treatments)
   block_unrep_list <- split(unrep_treatments_shuffled, rep(seq_len(n_blocks), length.out = length(unrep_treatments_shuffled)))
-
+  
   # Populate blocks
   for (b in seq_len(n_blocks)) {
     block_treatments <- c(check_treatments)  # Always include all checks in each block
-    block_families <- c(check_families)
-
+    
     # Add p-rep treatments assigned to this block
     for (treatment in names(p_rep_assignments)) {
       if (is.element(b, p_rep_assignments[[treatment]])) {
         block_treatments <- c(block_treatments, treatment)
-        block_families <- c(block_families, p_rep_families[which(p_rep_treatments == treatment)])
       }
     }
-
+    
     # Add unreplicated treatments assigned to this block
     if (b <= length(block_unrep_list)) {
       block_treatments <- c(block_treatments, block_unrep_list[[b]])
-      block_families <- c(block_families, unreplicated_families[match(block_unrep_list[[b]], unreplicated_treatments)])
     }
-
+    
+    # Assign correct family using the lookup vector
+    block_families <- sapply(block_treatments, function(trt) family_lookup[trt])
+    
     # Ensure no two adjacent treatments belong to the same family
     valid_order <- FALSE
     max_attempts <- attempts
     attempt <- 1
-
+    
     while (!valid_order && attempt <= max_attempts) {
       block_order <- sample(seq_along(block_treatments))
       block_shuffled <- block_treatments[block_order]
       block_fam_shuffled <- block_families[block_order]
-
+      
       if (!any(block_fam_shuffled[-1] == block_fam_shuffled[-length(block_fam_shuffled)])) {
         valid_order <- TRUE
       }
       attempt <- attempt + 1
     }
-
+    
     if (!valid_order) {
-    warning(paste0("Could not completely avoid adjacent families in block ", b,
-                   " after ", max_attempts, " attempts."))
-                   }
-
+      warning(paste0("Could not completely avoid adjacent families in block ", b,
+                     " after ", max_attempts, " attempts.")) 
+    }
+    
     blocks[[b]] <- data.frame(Treatment = block_shuffled, Family = block_fam_shuffled, Block = b)
   }
-
+  
   final_data <- do.call(rbind, blocks)
   final_data$Plot <- seq_len(nrow(final_data))
   final_data$Row <- (final_data$Plot - 1) %/% n_cols + 1
   final_data$Column <- (final_data$Plot - 1) %% n_cols + 1
-
+  
   # Apply serpentine layout if required
   if (serpentine) {
     for (r in seq_len(n_rows)) {
-      if (mod(r, 2) == 0) {
+      if (r %% 2 == 0) {
         final_data$Column[final_data$Row == r] <- rev(final_data$Column[final_data$Row == r])
       }
     }
   }
-
+  
   # Create layout matrix in correct serpentine order
   layout_matrix <- matrix(NA, nrow = n_rows, ncol = n_cols)
   for (r in seq_len(n_rows)) {
-    if (serpentine && (mod(r, 2) == 0)) {
+    if (serpentine && (r %% 2 == 0)) {
       layout_matrix[r, ] <- rev(final_data$Treatment[final_data$Row == r])
     } else {
       layout_matrix[r, ] <- final_data$Treatment[final_data$Row == r]
     }
   }
-
+  
   return(list(layout_matrix = layout_matrix, field_book = final_data))
 }
 }
