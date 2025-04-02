@@ -129,7 +129,6 @@ prep_famopt <- function(check_treatments, check_families,
     if (warn_and_correct) {
       warning(paste0("Field size (", n_rows, " rows x ", n_cols, " cols = ",
                      field_size, " plots) does not match required (", total_required, "). Adjusting layout dimensions..."))
-      n_rows <- ceiling(sqrt(total_required))
       n_cols <- ceiling(total_required / n_rows)
       field_size <- n_rows * n_cols
     } else {
@@ -233,13 +232,22 @@ prep_famopt <- function(check_treatments, check_families,
   
   # Create layout matrix in correct serpentine order
   layout_matrix <- matrix(NA, nrow = n_rows, ncol = n_cols)
-  for (r in seq_len(n_rows)) {
-    if (serpentine && (r %% 2 == 0)) {
-      layout_matrix[r, ] <- rev(final_data$Treatment[final_data$Row == r])
+  for (i in seq_len(nrow(final_data))) {
+    r <- final_data$Row[i]
+    c <- final_data$Column[i]
+    
+    # Apply serpentine logic directly to column position
+    actual_col <- if (serpentine && (r %% 2 == 0)) {
+      n_cols - c + 1  # reverse column if even row
     } else {
-      layout_matrix[r, ] <- final_data$Treatment[final_data$Row == r]
+      c
     }
+    
+    layout_matrix[r, actual_col] <- final_data$Treatment[i]
   }
+  
+  return(list(layout_matrix = layout_matrix, field_book = final_data))
+}
   
   return(list(layout_matrix = layout_matrix, field_book = final_data))
 }
