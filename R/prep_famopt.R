@@ -98,7 +98,7 @@ prep_famopt <- function(check_treatments, check_families,
                         p_rep_treatments, p_rep_reps, p_rep_families,
                         unreplicated_treatments, unreplicated_families,
                         n_blocks, n_rows, n_cols,
-                        serpentine = FALSE, seed = NULL, attempts = 100, warn_and_correct = TRUE) {
+                        serpentine = FALSE, seed = NULL, attempts = 100, warn_and_correct = TRUE, fix_rows = TRUE) {
   if (!is.null(seed)) {
     set.seed(seed)
   }
@@ -129,11 +129,19 @@ prep_famopt <- function(check_treatments, check_families,
     if (warn_and_correct) {
       warning(paste0("Field size (", n_rows, " rows x ", n_cols, " cols = ",
                      field_size, " plots) does not match required (", total_required, "). Adjusting layout dimensions..."))
-      n_cols <- ceiling(total_required / n_rows)
-      field_size <- n_rows * n_cols
+
+      if (fix_rows) {
+        # Adjust columns based on fixed number of rows
+        n_cols <- ceiling(total_required / n_rows)
+      } else {
+        # Adjust rows based on fixed number of columns
+        n_rows <- ceiling(total_required / n_cols)
+      }
+
+      field_size <- n_rows * n_cols  # Recalculate
     } else {
       stop(paste0("Provided field dimensions (", field_size, " plots) do not match the required (",
-                  total_required, "). Adjust `n_rows` or `n_cols`."))
+                  total_required, "). Adjust `n_rows` or `n_cols`, or enable warn_and_correct."))
     }
   }
 
