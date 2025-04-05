@@ -279,16 +279,16 @@ prep_famopt_unsize <- function(check_treatments, check_families,
   # Build all blocks
   blocks <- vector("list", n_blocks)
   for (b in seq_len(n_blocks)) {
-    p_rep_in_block <- names(p_rep_assignments)[sapply(p_rep_assignments, function(x) b %in% x)]
-    unrep_in_block <- if (b <= length(block_unrep_list)) sample(block_unrep_list[[b]]) else character(0)
+  p_rep_in_block <- names(p_rep_assignments)[sapply(p_rep_assignments, function(x) any(x == b))]
+  unrep_in_block <- if (b <= length(block_unrep_list)) sample(block_unrep_list[[b]]) else character(0)
 
-    blocks[[b]] <- assemble_block(
-      check_trts = check_treatments,
-      p_rep_trts = p_rep_in_block,
-      unrep_trts = unrep_in_block,
-      block_num = b
-    )
-  }
+  blocks[[b]] <- assemble_block(
+    check_trts = check_treatments,
+    p_rep_trts = p_rep_in_block,
+    unrep_trts = unrep_in_block,
+    block_num = b
+  )
+}
 
   # Combine all blocks
   final_data <- do.call(rbind, blocks)
