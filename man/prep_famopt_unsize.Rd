@@ -1,18 +1,21 @@
-\name{prep_famopt}
-\alias{prep_famopt}
+\name{prep_famopt_unsize}
+\alias{prep_famopt_unsize}
 \title{
-Create a Partially Replicated (p-rep) Experimental Design Layout
+Create a Partially Replicated (p-rep) Experimental Design Layout with unequal column size to adapt to irregular field dimensions
 }
 \description{
-This function generates a partially replicated (p-rep) experimental design for field trials, ensuring that check treatments are balanced across blocks,
+This function generates a partially replicated (p-rep) experimental design with unequal column sizes for field trials, ensuring that check treatments are balanced across blocks,
 p-rep (partially replicated) and unreplicated treatments are distributed evenly, and similar families of treatments are not placed in adjacent positions.
 It also supports an optional serpentine layout for plot numbering and can auto-correct layout dimensions.
 }
 \usage{
-prep_famopt(check_treatments, check_families, p_rep_treatments, p_rep_reps,
-            p_rep_families, unreplicated_treatments, unreplicated_families,
-            n_blocks, n_rows, n_cols, serpentine = FALSE, seed = NULL,
-            attempts = 100, warn_and_correct = TRUE, fix_rows = TRUE)
+prep_famopt_unsize(check_treatments, check_families,
+                  p_rep_treatments, p_rep_reps, p_rep_families,
+                  unreplicated_treatments, unreplicated_families,
+                  n_blocks, n_rows, n_cols = NULL,
+                  cols_per_row,
+                  serpentine = TRUE, seed = NULL,
+                  attempts = 1000, warn_and_correct = TRUE, fix_rows = TRUE)
 }
 \arguments{
   \item{check_treatments}{A character vector of check treatment identifiers. Each check treatment appears exactly once in each block, ensuring full replication across blocks.}
@@ -35,6 +38,8 @@ prep_famopt(check_treatments, check_families, p_rep_treatments, p_rep_reps,
   \item{n_rows}{An integer specifying the number of rows in the field layout.}
 
   \item{n_cols}{An integer specifying the number of columns in the field layout.}
+
+  \item{cols_per_row}{A vector indicating the size of each columns according to the field reality. \code{cols_per_row} is required only when \code{n_cols} is set to \code{NULL}.}
 
   \item{serpentine}{A logical value indicating whether to use a serpentine plot layout.
   If \code{TRUE}, plot numbering (and filling of treatments) follows a snake-like pattern: left-to-right in the first row, right-to-left in the second row, and so on.
@@ -71,6 +76,8 @@ prep_famopt(check_treatments, check_families, p_rep_treatments, p_rep_reps,
   \item \strong{Reproducibility via Seed:} By specifying the \code{seed} parameter, users can obtain the same randomization and layout across runs.
 
   \item \strong{Automatic Layout Correction:} If the provided \code{n_rows} and \code{n_cols} do not exactly accommodate all the required plots, the function can adjust the layout. When \code{warn_and_correct = TRUE}, the function will automatically modify \code{n_rows} and/or \code{n_cols} to ensure that \code{n_rows * n_cols} equals the total number of plots required.
+
+  \item \strong{Unequal column size:} If \code{cols_per_row} is defined, and \code{n_cols} is \code{NULL}, the function automatically allows for unequal column sizes.
 }
 
 \strong{Input Validation:}
@@ -112,41 +119,57 @@ A list with two elements:
 \seealso{
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
-\examples{## Create a p-rep design with 2 checks, 1 p-rep, and 1 unreplicated treatment in 3 blocks.
- check_treatments <- c("CheckA", "CheckB")
- check_families <- c("FamCheck1", "FamCheck2")   # Families for checks
- p_rep_treatments <- c("T1")                     # One partially replicated treatment
- p_rep_reps <- c(2)                              # T1 will appear in 2 out of 3 blocks
- p_rep_families <- c("Fam1")                     # Family for T1
- unreplicated_treatments <- c("U1")              # One unreplicated treatment
- unreplicated_families <- c("Fam2")              # Family for U1
- n_blocks <- 3
- n_rows <- 3
- n_cols <- 3
- set.seed(42)
- design <- prep_famopt(check_treatments, check_families,
+\examples{## Create a p-rep design with 3 checks, 3 p-rep, and 6 unreplicated treatment in 10 blocks. Columns have unequal sizes.
+check_treatments <- c("CheckA", "CheckB", "CheckC")
+check_families <- c("FamCheck1", "FamCheck2", "FamCheck3")   # Families for checks
+p_rep_treatments <- c("T1", "T2", "T3")                    # One partially replicated treatment
+p_rep_reps <- c(8, 8, 8)                              # T1 will appear in 2 out of 3 blocks
+p_rep_families <- c("Fam1", "Fam2", "Fam2")   # Family for T1
+unreplicated_treatments <- c("U1", "U2", "U3", "U4", "U5", "U6")              # One unreplicated treatment
+unreplicated_families <- c("Fam1", "Fam2", "Fam3", "Fam4", "Fam5", "Fam6")              # Family for U1
+n_blocks <- 10
+n_rows <- 5
+
+cols_per_row <- c(10, 15, 12, 10, 13)
+design <- prep_famopt_unsize(check_treatments, check_families,
                               p_rep_treatments, p_rep_reps, p_rep_families,
                               unreplicated_treatments, unreplicated_families,
-                              n_blocks, n_rows, n_cols, serpentine = TRUE, seed = NULL, attempts = 1000, fix_rows = FALSE)
-print(design)
+                              n_blocks = n_blocks, n_rows = n_rows, n_cols = NULL,
+                              cols_per_row = cols_per_row,
+                              serpentine = TRUE, seed = NULL,
+                              attempts = 1000, warn_and_correct = TRUE, fix_rows = TRUE)
+#' # --- Create layout matrix ---
+ncols <- max(design$field_book$Column)
+layout_matrix <- matrix(NA, nrow = 5, ncol = ncols)
+for (i in seq_len(nrow(combined_fieldbook))) {
+  r <- design$field_book$Row[i]
+  c <- design$field_book$Column[i]
+  layout_matrix[r, c] <- design$field_book$Treatment[i]
+}
+
+#' # --- View the field book (first few entries) ---
+head(design$field_book)
+
 ##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,
 ##--	or standard data sets, see data().
 
 ## The function is currently defined as
-prep_famopt <- function(check_treatments, check_families,
-                        p_rep_treatments, p_rep_reps, p_rep_families,
-                        unreplicated_treatments, unreplicated_families,
-                        n_blocks, n_rows, n_cols,
-                        serpentine = FALSE, seed = NULL, attempts = 100, warn_and_correct = TRUE, fix_rows = TRUE) {
-  if (!is.null(seed)) {
-    set.seed(seed)
-  }
+prep_famopt_unsize <- function(check_treatments, check_families,
+                               p_rep_treatments, p_rep_reps, p_rep_families,
+                               unreplicated_treatments, unreplicated_families,
+                               n_blocks, n_rows = NULL, n_cols = NULL,
+                               cols_per_row = NULL,
+                               serpentine = FALSE, seed = NULL,
+                               attempts = 1000, warn_and_correct = TRUE, fix_rows = TRUE) {
+  if (!is.null(seed)) set.seed(seed)
 
+  # Validate input lengths
   if (length(check_treatments) != length(check_families)) {
     stop("Length of check_families must match length of check_treatments.")
   }
-  if (length(p_rep_treatments) != length(p_rep_reps) || length(p_rep_treatments) != length(p_rep_families)) {
+  if (length(p_rep_treatments) != length(p_rep_reps) ||
+      length(p_rep_treatments) != length(p_rep_families)) {
     stop("Lengths of p_rep_treatments, p_rep_reps, and p_rep_families must all match.")
   }
   if (length(unreplicated_treatments) != length(unreplicated_families)) {
@@ -155,146 +178,155 @@ prep_famopt <- function(check_treatments, check_families,
   if (any(p_rep_reps > n_blocks)) {
     stop("Each p-rep treatment's replication count must not exceed the number of blocks.")
   }
-  if (n_blocks < 1) {
-    stop("n_blocks must be at least 1.")
-  }
 
-  total_checks <- n_blocks * length(check_treatments)
-  total_prep <- sum(p_rep_reps)
-  total_unrep <- length(unreplicated_treatments)
-  total_required <- total_checks + total_prep + total_unrep
-
-  field_size <- n_rows * n_cols
-  if (field_size != total_required) {
-   if (warn_and_correct) {
-    warning(paste0("Field size (", n_rows, " rows x ", n_cols, " cols = ",
-                   field_size, " plots) does not match required (", total_required, "). Adjusting layout dimensions..."))
-
-    if (fix_rows) {
-      # Adjust columns based on fixed number of rows
-      n_cols <- ceiling(total_required / n_rows)
-    } else {
-      # Adjust rows based on fixed number of columns
-      n_rows <- ceiling(total_required / n_cols)
-    }
-
-    field_size <- n_rows * n_cols  # Recalculate
-  } else {
-    stop(paste0("Provided field dimensions (", field_size, " plots) do not match the required (",
-                total_required, "). Adjust `n_rows` or `n_cols`, or enable warn_and_correct."))
-  }
-  }
-
-  # Create a lookup mapping for treatments to families
+  # Create family lookup table
   family_lookup <- setNames(
     c(check_families, p_rep_families, unreplicated_families),
     c(check_treatments, p_rep_treatments, unreplicated_treatments)
   )
 
-  # Initialize empty block list
-  blocks <- vector("list", n_blocks)
+  # Calculate total treatments
+  total_checks <- n_blocks * length(check_treatments)
+  total_prep <- sum(p_rep_reps)
+  total_unrep <- length(unreplicated_treatments)
+  total_required <- total_checks + total_prep + total_unrep
 
-  # Assign p-rep treatments to unique blocks
+  # Determine field layout
+  if (!is.null(cols_per_row)) {
+    n_rows <- length(cols_per_row)
+    field_size <- sum(cols_per_row)
+  } else {
+    if (is.null(n_rows) || is.null(n_cols)) {
+      stop("If cols_per_row is not provided, both n_rows and n_cols must be specified.")
+    }
+    field_size <- n_rows * n_cols
+    cols_per_row <- rep(n_cols, n_rows)
+  }
+
+  # Adjust layout if needed
+  if (field_size != total_required) {
+    if (warn_and_correct && is.null(cols_per_row)) {
+      warning(paste0("Field size (", field_size, ") does not match required (", total_required, "). Adjusting layout..."))
+      if (fix_rows) {
+        n_cols <- ceiling(total_required / n_rows)
+      } else {
+        n_rows <- ceiling(total_required / n_cols)
+      }
+      cols_per_row <- rep(n_cols, n_rows)
+      field_size <- sum(cols_per_row)
+    } else {
+      stop(paste0("Field size (", field_size, " plots) does not match required (", total_required, ")."))
+    }
+  }
+
+  # Assign p-rep treatments to blocks
   p_rep_assignments <- vector("list", length(p_rep_treatments))
   names(p_rep_assignments) <- p_rep_treatments
-
-  available_blocks <- vector("list", length(p_rep_treatments))
-  for (i in seq_along(p_rep_treatments)) {
-    available_blocks[[i]] <- sample(seq_len(n_blocks))  # Random block order
-  }
+  available_blocks <- lapply(seq_along(p_rep_treatments), function(i) sample(seq_len(n_blocks)))
 
   for (i in seq_along(p_rep_treatments)) {
     treatment <- p_rep_treatments[i]
-    num_reps <- p_rep_reps[i]
-
-    if (num_reps > length(available_blocks[[i]])) {
-      stop(paste0("Error: Not enough unique blocks available for p-rep treatment '", treatment, "'."))
+    reps <- p_rep_reps[i]
+    if (reps > length(available_blocks[[i]])) {
+      stop(paste0("Not enough blocks for p-rep treatment '", treatment, "'"))
     }
-
-    assigned_blocks <- sample(available_blocks[[i]], num_reps)  # Select unique blocks
-    available_blocks[[i]] <- setdiff(available_blocks[[i]], assigned_blocks)  # Remove used blocks
-
-    p_rep_assignments[[treatment]] <- assigned_blocks
+    assigned <- sample(available_blocks[[i]], reps)
+    available_blocks[[i]] <- setdiff(available_blocks[[i]], assigned)
+    p_rep_assignments[[treatment]] <- assigned
   }
 
-  # Shuffle and distribute unreplicated treatments across blocks
-  unrep_treatments_shuffled <- sample(unreplicated_treatments)
-  block_unrep_list <- split(unrep_treatments_shuffled, rep(seq_len(n_blocks), length.out = length(unrep_treatments_shuffled)))
+  # Distribute unreplicated treatments
+  unrep_shuffled <- sample(unreplicated_treatments)
+  block_unrep_list <- split(unrep_shuffled, rep(seq_len(n_blocks), length.out = length(unrep_shuffled)))
 
-  # Populate blocks
-  for (b in seq_len(n_blocks)) {
-    block_treatments <- c(check_treatments)  # Always include all checks in each block
-
-    # Add p-rep treatments assigned to this block
-    for (treatment in names(p_rep_assignments)) {
-      if (is.element(b, p_rep_assignments[[treatment]])) {
-        block_treatments <- c(block_treatments, treatment)
-      }
-    }
-
-    # Add unreplicated treatments assigned to this block
-    if (b <= length(block_unrep_list)) {
-      block_treatments <- c(block_treatments, block_unrep_list[[b]])
-    }
-
-    # Assign correct family using the lookup vector
-    block_families <- sapply(block_treatments, function(trt) family_lookup[trt])
-
-    # Ensure no two adjacent treatments belong to the same family
-    valid_order <- FALSE
-    max_attempts <- attempts
+  # Block assembly function with check randomization
+  assemble_block <- function(check_trts, p_rep_trts, unrep_trts, block_num) {
+    valid_block <- FALSE
     attempt <- 1
+    n_checks <- length(check_trts)
 
-    while (!valid_order && attempt <= max_attempts) {
-      block_order <- sample(seq_along(block_treatments))
-      block_shuffled <- block_treatments[block_order]
-      block_fam_shuffled <- block_families[block_order]
+    while (!valid_block && attempt <= attempts) {
+      # Combine and shuffle all treatments
+      all_trts <- sample(c(check_trts, p_rep_trts, unrep_trts))
 
-      if (!any(block_fam_shuffled[-1] == block_fam_shuffled[-length(block_fam_shuffled)])) {
-        valid_order <- TRUE
-      }
+      # Check family separation
+      families <- family_lookup[all_trts]
+      family_ok <- !any(families[-1] == families[-length(families)])
+
+      # Check distribution
+      check_pos <- which(!is.na(match(all_trts, check_trts)))
+      spacing_ok <- if (n_checks > 1) {
+        min_spacing <- floor(length(all_trts) / (n_checks + 1))
+        all(diff(check_pos) >= min_spacing)
+      } else TRUE
+
+      valid_block <- family_ok && spacing_ok
       attempt <- attempt + 1
     }
 
-    if (!valid_order) {
-      warning(paste0("Could not completely avoid adjacent families in block ", b,
-                     " after ", max_attempts, " attempts."))
+    if (!valid_block) {
+      warning("Could not find ideal arrangement for checks in block ", block_num)
     }
 
-    blocks[[b]] <- data.frame(Treatment = block_shuffled, Family = block_fam_shuffled, Block = b)
+    data.frame(
+      Treatment = all_trts,
+      Family = families,
+      Block = block_num,
+      stringsAsFactors = FALSE
+    )
   }
 
+  # Build all blocks
+  blocks <- vector("list", n_blocks)
+  for (b in seq_len(n_blocks)) {
+    p_rep_in_block <- names(p_rep_assignments)[sapply(p_rep_assignments, function(x) b %in% x)]
+    unrep_in_block <- if (b <= length(block_unrep_list)) sample(block_unrep_list[[b]]) else character(0)
+
+    blocks[[b]] <- assemble_block(
+      check_trts = check_treatments,
+      p_rep_trts = p_rep_in_block,
+      unrep_trts = unrep_in_block,
+      block_num = b
+    )
+  }
+
+  # Combine all blocks
   final_data <- do.call(rbind, blocks)
   final_data$Plot <- seq_len(nrow(final_data))
-  final_data$Row <- (final_data$Plot - 1) %/% n_cols + 1
-  final_data$Column <- (final_data$Plot - 1) %% n_cols + 1
 
-  # Apply serpentine layout if required
+  # Assign row/column positions
+  get_row_col <- function(plot_num, cols_per_row) {
+    cum_counts <- cumsum(cols_per_row)
+    row <- which(plot_num <= cum_counts)[1]
+    col <- plot_num - ifelse(row == 1, 0, cum_counts[row - 1])
+    c(row, col)
+  }
+
+  pos <- t(sapply(final_data$Plot, get_row_col, cols_per_row))
+  final_data$Row <- pos[, 1]
+  final_data$Column <- pos[, 2]
+
+  # Apply serpentine pattern
   if (serpentine) {
-    for (r in seq_len(n_rows)) {
+    for (r in seq_along(cols_per_row)) {
+      idx <- which(final_data$Row == r)
       if (mod(r, 2) == 0) {
-        final_data$Column[final_data$Row == r] <- rev(final_data$Column[final_data$Row == r])
+        final_data$Column[idx] <- rev(final_data$Column[idx])
       }
     }
   }
 
-  # Create layout matrix in correct serpentine order
-  layout_matrix <- matrix(NA, nrow = n_rows, ncol = n_cols)
-  for (i in seq_len(nrow(final_data))) {
-    r <- final_data$Row[i]
-    c <- final_data$Column[i]
+  # Create layout matrix
+  layout_matrix <- lapply(seq_len(n_rows), function(r) {
+    row_data <- final_data[final_data$Row == r, ]
+    row_data <- row_data[order(row_data$Column), ]
+    row_data$Treatment
+  })
 
-    # Apply serpentine logic directly to column position
-    actual_col <- if (serpentine && (mod(r, 2) == 0)) {
-      n_cols - c + 1  # reverse column if even row
-    } else {
-      c
-    }
-
-    layout_matrix[r, actual_col] <- final_data$Treatment[i]
-  }
-
-  return(list(layout_matrix = layout_matrix, field_book = final_data))
+  return(list(
+    layout_matrix = layout_matrix,
+    field_book = final_data
+  ))
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

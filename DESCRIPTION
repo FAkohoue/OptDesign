@@ -1,6 +1,6 @@
 Package: OptDesign
 Type: Package
-Title: An R package for generating improved experimental designs with spatially and genetically correlated observations using mixed models.
+Title: An R package for generating improved experimental designs with spatially and genetically correlated observations adapted for mixed models.
 Version: 0.1.0
 Author: Félicien Akohoue
 Maintainer: Félicien Akohoue <akohoue.f@gmail.com>
