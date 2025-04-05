@@ -144,8 +144,9 @@ layout_matrix <- matrix(NA, nrow = 5, ncol = ncols)
 for (i in seq_len(nrow(combined_fieldbook))) {
   r <- design$field_book$Row[i]
   c <- design$field_book$Column[i]
-  (layout_matrix[r, c] <- design$field_book$Treatment[i])
+  layout_matrix[r, c] <- design$field_book$Treatment[i]
 }
+print(layout_matrix)
 
 #' # --- View the field book (first few entries) ---
 head(design$field_book)
