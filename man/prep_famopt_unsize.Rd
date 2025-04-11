@@ -162,11 +162,11 @@ prep_famopt_unsize <- function(check_treatments, check_families,
                                p_rep_treatments, p_rep_reps, p_rep_families,
                                unreplicated_treatments, unreplicated_families,
                                n_blocks, n_rows = NULL, n_cols = NULL,
-                               cols_per_row = NULL, order = column,
+                               cols_per_row = NULL, order = column, 
                                serpentine = FALSE, seed = NULL,
                                attempts = 1000, warn_and_correct = TRUE, fix_rows = TRUE) {
   if (!is.null(seed)) set.seed(seed)
-
+  
   # Validate input lengths
   if (length(check_treatments) != length(check_families)) {
     stop("Length of check_families must match length of check_treatments.")
@@ -181,19 +181,19 @@ prep_famopt_unsize <- function(check_treatments, check_families,
   if (any(p_rep_reps > n_blocks)) {
     stop("Each p-rep treatment's replication count must not exceed the number of blocks.")
   }
-
+  
   # Create family lookup table
   family_lookup <- setNames(
     c(check_families, p_rep_families, unreplicated_families),
     c(check_treatments, p_rep_treatments, unreplicated_treatments)
   )
-
+  
   # Calculate total treatments
   total_checks <- n_blocks * length(check_treatments)
   total_prep <- sum(p_rep_reps)
   total_unrep <- length(unreplicated_treatments)
   total_required <- total_checks + total_prep + total_unrep
-
+  
   # Determine field layout
   if (!is.null(cols_per_row)) {
     n_rows <- length(cols_per_row)
@@ -205,7 +205,7 @@ prep_famopt_unsize <- function(check_treatments, check_families,
     field_size <- n_rows * n_cols
     cols_per_row <- rep(n_cols, n_rows)
   }
-
+  
   # Adjust layout if needed
   if (field_size != total_required) {
     if (warn_and_correct && is.null(cols_per_row)) {
@@ -221,12 +221,12 @@ prep_famopt_unsize <- function(check_treatments, check_families,
       stop(paste0("Field size (", field_size, " plots) does not match required (", total_required, ")."))
     }
   }
-
+  
   # Assign p-rep treatments to blocks
   p_rep_assignments <- vector("list", length(p_rep_treatments))
   names(p_rep_assignments) <- p_rep_treatments
   available_blocks <- lapply(seq_along(p_rep_treatments), function(i) sample(seq_len(n_blocks)))
-
+  
   for (i in seq_along(p_rep_treatments)) {
     treatment <- p_rep_treatments[i]
     reps <- p_rep_reps[i]
@@ -237,40 +237,40 @@ prep_famopt_unsize <- function(check_treatments, check_families,
     available_blocks[[i]] <- setdiff(available_blocks[[i]], assigned)
     p_rep_assignments[[treatment]] <- assigned
   }
-
+  
   # Distribute unreplicated treatments
   unrep_shuffled <- sample(unreplicated_treatments)
   block_unrep_list <- split(unrep_shuffled, rep(seq_len(n_blocks), length.out = length(unrep_shuffled)))
-
+  
   # Block assembly function with check randomization
   assemble_block <- function(check_trts, p_rep_trts, unrep_trts, block_num) {
     valid_block <- FALSE
     attempt <- 1
     n_checks <- length(check_trts)
-
+    
     while (!valid_block && attempt <= attempts) {
       # Combine and shuffle all treatments
       all_trts <- sample(c(check_trts, p_rep_trts, unrep_trts))
-
+      
       # Check family separation
       families <- family_lookup[all_trts]
       family_ok <- !any(families[-1] == families[-length(families)])
-
+      
       # Check distribution
       check_pos <- which(!is.na(match(all_trts, check_trts)))
       spacing_ok <- if (n_checks > 1) {
         min_spacing <- floor(length(all_trts) / (n_checks + 1))
         all(diff(check_pos) >= min_spacing)
       } else TRUE
-
+      
       valid_block <- family_ok && spacing_ok
       attempt <- attempt + 1
     }
-
+    
     if (!valid_block) {
       warning("Could not find ideal arrangement for checks in block ", block_num)
     }
-
+    
     data.frame(
       Treatment = all_trts,
       Family = families,
@@ -278,73 +278,89 @@ prep_famopt_unsize <- function(check_treatments, check_families,
       stringsAsFactors = FALSE
     )
   }
-
+  
   # Build all blocks
   blocks <- vector("list", n_blocks)
   for (b in seq_len(n_blocks)) {
-  p_rep_in_block <- names(p_rep_assignments)[sapply(p_rep_assignments, function(x) any(x == b))]
-  unrep_in_block <- if (b <= length(block_unrep_list)) sample(block_unrep_list[[b]]) else character(0)
-
-  blocks[[b]] <- assemble_block(
-    check_trts = check_treatments,
-    p_rep_trts = p_rep_in_block,
-    unrep_trts = unrep_in_block,
-    block_num = b
-  )
-}
-
+    p_rep_in_block <- names(p_rep_assignments)[sapply(p_rep_assignments, function(x) any(x == b))]
+    unrep_in_block <- if (b <= length(block_unrep_list)) sample(block_unrep_list[[b]]) else character(0)
+    
+    blocks[[b]] <- assemble_block(
+      check_trts = check_treatments,
+      p_rep_trts = p_rep_in_block,
+      unrep_trts = unrep_in_block,
+      block_num = b
+    )
+  }
+  
   # Combine all blocks
   final_data <- do.call(rbind, blocks)
   final_data$Plot <- seq_len(nrow(final_data))
-
+  
   # Assign row/column positions
   get_row_col <- function(plot_num, cols_per_row, order) {
-  if (order == "column") {
-    total_rows <- length(cols_per_row)
-    col <- (plot_num - 1) %/% total_rows + 1
-    row <- (plot_num - 1) %% total_rows + 1
-    c(row, col)
-  } else if (order == "row") {
-    cum_counts <- cumsum(cols_per_row)
-    row <- which(plot_num <= cum_counts)[1]
-    col <- plot_num - ifelse(row == 1, 0, cum_counts[row - 1])
-    c(row, col)
-  } else {
-    stop("Invalid 'order' argument. Use 'row' or 'column'.")
+    if (order == "column") {
+      # Prepare coordinates of all valid positions (row, col)
+      position_list <- list()
+      plot_counter <- 1
+      
+      max_cols <- max(cols_per_row)
+      total_rows <- length(cols_per_row)
+      
+      for (col in 1:max_cols) {
+        for (row in 1:total_rows) {
+          if (col <= cols_per_row[row]) {
+            position_list[[plot_counter]] <- c(row, col)
+            plot_counter <- plot_counter + 1
+          }
+        }
+      }
+      
+      pos <- position_list[[plot_num]]
+      c(pos[1], pos[2])
+      
+    } else if (order == "row") {
+      cum_counts <- cumsum(cols_per_row)
+      row <- which(plot_num <= cum_counts)[1]
+      col <- plot_num - ifelse(row == 1, 0, cum_counts[row - 1])
+      c(row, col)
+    } else {
+      stop("Invalid 'order' argument. Use 'row' or 'column'.")
+    }
   }
-  }
+  
   pos <- t(sapply(final_data$Plot, get_row_col, cols_per_row = cols_per_row, order = order))
   final_data$Row <- pos[, 1]
   final_data$Column <- pos[, 2]
-
+  
   # Apply serpentine pattern
   if (serpentine) {
-  if (order == "row") {
-    # Reverse columns within even rows
-    for (r in seq_along(cols_per_row)) {
-      idx <- which(final_data$Row == r)
-      if (mod(r, 2) == 0) {
-        final_data$Column[idx] <- rev(final_data$Column[idx])
+    if (order == "row") {
+      # Reverse columns within even rows
+      for (r in seq_along(cols_per_row)) {
+        idx <- which(final_data$Row == r)
+        if (mod(r, 2) == 0) {
+          final_data$Column[idx] <- rev(final_data$Column[idx])
+        }
       }
-    }
-  } else if (order == "column") {
-    # Reverse rows within even columns
-    for (c in seq_len(max(final_data$Column))) {
-      idx <- which(final_data$Column == c)
-      if (mod(c, 2) == 0) {
-        final_data$Row[idx] <- rev(final_data$Row[idx])
+    } else if (order == "column") {
+      # Reverse rows within even columns
+      for (c in seq_len(max(final_data$Column))) {
+        idx <- which(final_data$Column == c)
+        if (mod(c, 2) == 0) {
+          final_data$Row[idx] <- rev(final_data$Row[idx])
+        }
       }
     }
   }
-  }
-
+  
+  
   # Create layout matrix
   layout_matrix <- lapply(seq_len(n_rows), function(r) {
-  row_data <- final_data[final_data$Row == r, ]
-  row_data <- row_data[order(row_data$Column), ]
-  row_data$Treatment
-})
-
+    row_data <- final_data[final_data$Row == r, ]
+    row_data <- row_data[order(row_data$Column), ]
+    row_data$Treatment
+  })
   return(list(
     layout_matrix = layout_matrix,
     field_book = final_data
