@@ -15,6 +15,7 @@
 #' @param n_rows Integer number of rows in the field layout.
 #' @param n_cols Integer number of columns in the field layout.
 #' @param cols_per_row A vector indicating the size of each columns according to the field reality. cols_per_row is required only when n_cols is set to `NULL`.
+#' @param order Plot numbering order, either `column` (default) or `row`.
 #' @param serpentine Logical, whether to use serpentine plot layout. If `TRUE`, plot numbering (and filling of treatments) will snake through the field: left-to-right in the first row, then right-to-left in the second, and so on. If `FALSE`, plot numbering proceeds left-to-right for every row.
 #' @param seed Optional integer seed for random number generation. Use this for reproducible randomization.
 #' @param attempts Number of iterations for family distribution across blocks.
@@ -76,7 +77,7 @@
 #'                              p_rep_treatments, p_rep_reps, p_rep_families,
 #'                              unreplicated_treatments, unreplicated_families,
 #'                              n_blocks = n_blocks, n_rows = n_rows, n_cols = NULL,
-#'                              cols_per_row = cols_per_row,
+#'                              cols_per_row = cols_per_row, order = column,
 #'                              serpentine = TRUE, seed = NULL,
 #'                              attempts = 1000, warn_and_correct = TRUE, fix_rows = TRUE)
 #'
@@ -115,7 +116,7 @@ prep_famopt_unsize <- function(check_treatments, check_families,
                                p_rep_treatments, p_rep_reps, p_rep_families,
                                unreplicated_treatments, unreplicated_families,
                                n_blocks, n_rows = NULL, n_cols = NULL,
-                               cols_per_row = NULL,
+                               cols_per_row = NULL, order = column, 
                                serpentine = FALSE, seed = NULL,
                                attempts = 1000, warn_and_correct = TRUE, fix_rows = TRUE) {
   if (!is.null(seed)) set.seed(seed)
@@ -251,17 +252,25 @@ prep_famopt_unsize <- function(check_treatments, check_families,
   final_data$Plot <- seq_len(nrow(final_data))
 
   # Assign row/column positions
-  get_row_col <- function(plot_num, cols_per_row) {
+  get_row_col <- function(plot_num, cols_per_row, order) {
+  if (order == "column") {
+    total_rows <- length(cols_per_row)
+    col <- (plot_num - 1) %/% total_rows + 1
+    row <- (plot_num - 1) %% total_rows + 1
+    c(row, col)
+  } else if (order == "row") {
     cum_counts <- cumsum(cols_per_row)
     row <- which(plot_num <= cum_counts)[1]
     col <- plot_num - ifelse(row == 1, 0, cum_counts[row - 1])
     c(row, col)
+  } else {
+    stop("Invalid 'order' argument. Use 'row' or 'column'.")
   }
-
-  pos <- t(sapply(final_data$Plot, get_row_col, cols_per_row))
+  }
+  pos <- t(sapply(final_data$Plot, get_row_col, cols_per_row = cols_per_row, order = order))
   final_data$Row <- pos[, 1]
   final_data$Column <- pos[, 2]
-
+                                                      
   # Apply serpentine pattern
   if (serpentine) {
     for (r in seq_along(cols_per_row)) {
