@@ -280,28 +280,31 @@ prep_famopt <- function(check_treatments, check_families,
 
   # Apply serpentine layout if required
   if (serpentine) {
+  if (order == "row") {
+    # Reverse columns within even rows
     for (r in seq_len(n_rows)) {
       if (mod(r, 2) == 0) {
         final_data$Column[final_data$Row == r] <- rev(final_data$Column[final_data$Row == r])
       }
     }
+  } else if (order == "column") {
+    # Reverse rows within even columns
+    for (c in seq_len(n_cols)) {
+      if (mod(c, 2) == 0) {
+        final_data$Row[final_data$Column == c] <- rev(final_data$Row[final_data$Column == c])
+      }
+    }
   }
+}
 
   # Create layout matrix in correct serpentine order
   layout_matrix <- matrix(NA, nrow = n_rows, ncol = n_cols)
   for (i in seq_len(nrow(final_data))) {
-    r <- final_data$Row[i]
-    c <- final_data$Column[i]
-
-    # Apply serpentine logic directly to column position
-    actual_col <- if (serpentine && (mod(r, 2) == 0)) {
-      n_cols - c + 1  # reverse column if even row
-    } else {
-      c
-    }
-
-    layout_matrix[r, actual_col] <- final_data$Treatment[i]
-  }
+  r <- final_data$Row[i]
+  c <- final_data$Column[i]
+  
+  layout_matrix[r, c] <- final_data$Treatment[i]
+}
 
   return(list(layout_matrix = layout_matrix, field_book = final_data))
 }
