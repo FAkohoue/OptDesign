@@ -11,7 +11,7 @@ It also supports an optional serpentine layout for plot numbering and can auto-c
 \usage{
 prep_famopt(check_treatments, check_families, p_rep_treatments, p_rep_reps,
             p_rep_families, unreplicated_treatments, unreplicated_families,
-            n_blocks, n_rows, n_cols, serpentine = FALSE, seed = NULL,
+            n_blocks, n_rows, n_cols, order = column, serpentine = FALSE, seed = NULL,
             attempts = 100, warn_and_correct = TRUE, fix_rows = TRUE)
 }
 \arguments{
