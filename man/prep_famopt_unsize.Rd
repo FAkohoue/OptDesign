@@ -313,7 +313,7 @@ prep_famopt_unsize <- function(check_treatments, check_families,
     stop("Invalid 'order' argument. Use 'row' or 'column'.")
   }
   }
-  pos <- t(sapply(final_data$Plot, get_row_col, cols_per_row))
+  pos <- t(sapply(final_data$Plot, get_row_col, cols_per_row = cols_per_row, order = order))
   final_data$Row <- pos[, 1]
   final_data$Column <- pos[, 2]
 
