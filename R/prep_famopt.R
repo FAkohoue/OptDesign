@@ -14,6 +14,7 @@
 #' @param n_blocks Integer number of blocks (replicates). Each check treatment will appear in every block exactly once. Block count should be ≥ 1.
 #' @param n_rows Integer number of rows in the field layout.
 #' @param n_cols Integer number of columns in the field layout.
+#' @param order Plot numbering order, either `column` (default) or `row`
 #' @param serpentine Logical, whether to use serpentine plot layout. If `TRUE`, plot numbering (and filling of treatments) will snake through the field: left-to-right in the first row, then right-to-left in the second, and so on. If `FALSE`, plot numbering proceeds left-to-right for every row.
 #' @param seed Optional integer seed for random number generation. Use this for reproducible randomization.
 #' @param attempts Number of iterations for family distribution across blocks.
@@ -100,7 +101,7 @@
 prep_famopt <- function(check_treatments, check_families,
                         p_rep_treatments, p_rep_reps, p_rep_families,
                         unreplicated_treatments, unreplicated_families,
-                        n_blocks, n_rows, n_cols,
+                        n_blocks, n_rows, n_cols, order = "column",
                         serpentine = FALSE, seed = NULL, attempts = 1000, warn_and_correct = TRUE, fix_rows = TRUE) {
   if (!is.null(seed)) {
     set.seed(seed)
@@ -229,8 +230,15 @@ prep_famopt <- function(check_treatments, check_families,
 
   final_data <- do.call(rbind, blocks)
   final_data$Plot <- seq_len(nrow(final_data))
-  final_data$Row <- (final_data$Plot - 1) %/% n_cols + 1
-  final_data$Column <- (final_data$Plot - 1) %% n_cols + 1
+  if (order == "column") {
+    final_data$Column <- (final_data$Plot - 1) %/% n_rows + 1
+    final_data$Row <- (final_data$Plot - 1) %% n_rows + 1
+  } else if (order == "row") {
+    final_data$Row <- (final_data$Plot - 1) %/% n_cols + 1
+    final_data$Column <- (final_data$Plot - 1) %% n_cols + 1
+  } else {
+    stop("Invalid 'order' argument. Use 'row' or 'column'.")
+  }
 
   # Apply serpentine layout if required
   if (serpentine) {
