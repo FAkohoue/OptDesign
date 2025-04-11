@@ -36,6 +36,8 @@ prep_famopt(check_treatments, check_families, p_rep_treatments, p_rep_reps,
 
   \item{n_cols}{An integer specifying the number of columns in the field layout.}
 
+  \item{order}{Plot numbering order, either \code{column} (default) or \code{row}.}
+
   \item{serpentine}{A logical value indicating whether to use a serpentine plot layout.
   If \code{TRUE}, plot numbering (and filling of treatments) follows a snake-like pattern: left-to-right in the first row, right-to-left in the second row, and so on.
   If \code{FALSE}, plot numbering proceeds left-to-right for every row.}
@@ -137,7 +139,7 @@ print(design)
 prep_famopt <- function(check_treatments, check_families,
                         p_rep_treatments, p_rep_reps, p_rep_families,
                         unreplicated_treatments, unreplicated_families,
-                        n_blocks, n_rows, n_cols,
+                        n_blocks, n_rows, n_cols, order = column,
                         serpentine = FALSE, seed = NULL, attempts = 100, warn_and_correct = TRUE, fix_rows = TRUE) {
   if (!is.null(seed)) {
     set.seed(seed)
@@ -266,8 +268,15 @@ prep_famopt <- function(check_treatments, check_families,
 
   final_data <- do.call(rbind, blocks)
   final_data$Plot <- seq_len(nrow(final_data))
+ if (order == "column") {
+  final_data$Column <- (final_data$Plot - 1) %/% n_rows + 1
+  final_data$Row <- (final_data$Plot - 1) %% n_rows + 1
+} else if (order == "row") {
   final_data$Row <- (final_data$Plot - 1) %/% n_cols + 1
   final_data$Column <- (final_data$Plot - 1) %% n_cols + 1
+} else {
+  stop("Invalid 'order' argument. Use 'row' or 'column'.")
+}
 
   # Apply serpentine layout if required
   if (serpentine) {
