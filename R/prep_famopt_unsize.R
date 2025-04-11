@@ -273,21 +273,32 @@ prep_famopt_unsize <- function(check_treatments, check_families,
                                                       
   # Apply serpentine pattern
   if (serpentine) {
+  if (order == "row") {
+    # Reverse columns within even rows
     for (r in seq_along(cols_per_row)) {
       idx <- which(final_data$Row == r)
       if (mod(r, 2) == 0) {
         final_data$Column[idx] <- rev(final_data$Column[idx])
       }
     }
+  } else if (order == "column") {
+    # Reverse rows within even columns
+    for (c in seq_len(max(final_data$Column))) {
+      idx <- which(final_data$Column == c)
+      if (mod(c, 2) == 0) {
+        final_data$Row[idx] <- rev(final_data$Row[idx])
+      }
+    }
   }
+  }
+
 
   # Create layout matrix
   layout_matrix <- lapply(seq_len(n_rows), function(r) {
-    row_data <- final_data[final_data$Row == r, ]
-    row_data <- row_data[order(row_data$Column), ]
-    row_data$Treatment
-  })
-
+  row_data <- final_data[final_data$Row == r, ]
+  row_data <- row_data[order(row_data$Column), ]
+  row_data$Treatment
+})
   return(list(
     layout_matrix = layout_matrix,
     field_book = final_data
